@@ -15,6 +15,13 @@ type AddressServiceImpl struct {
 	DB          *sql.DB
 }
 
+func NewAddressService(addressRepo repository.AddressRepository, DB *sql.DB) AddressService {
+	return AddressServiceImpl{
+		AddressRepo: addressRepo,
+		DB:          DB,
+	}
+}
+
 func (service AddressServiceImpl) Create(ctx context.Context, request web.AddressCreateRequest) web.AddressReponse {
 
 	tx, err := service.DB.Begin()

@@ -14,6 +14,12 @@ type AddressControllerImpl struct {
 	AddressService service.AddressService
 }
 
+func NewAddressController(addressService service.AddressService) AddressController {
+	return &AddressControllerImpl{
+		AddressService: addressService,
+	}
+}
+
 func (controller *AddressControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	addressCreateRequest := web.AddressCreateRequest{}
@@ -92,5 +98,15 @@ func (controller *AddressControllerImpl) FindById(writer http.ResponseWriter, re
 }
 
 func (controller *AddressControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	claim := web.Claims{}
+	helper.ParseJwt(request, &claim)
+
+	addressResponses := controller.AddressService.FindAll(request.Context(), claim.Id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   addressResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

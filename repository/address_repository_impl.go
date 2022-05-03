@@ -12,6 +12,10 @@ import (
 type AddressRepositoryImpl struct {
 }
 
+func NewAddressRepository() AddressRepository {
+	return AddressRepositoryImpl{}
+}
+
 func (repository AddressRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address {
 	SQL := "insert into addresses (user_id, name, handphone_number, street, districk, post_code, comment) values (?,?,?,?,?,?,?)"
 	result, err := tx.ExecContext(ctx, SQL, address.User.Id, address.Name, address.HandphoneNumber, address.Street, address.Districk, address.PostCode, address.Comment)
@@ -69,7 +73,7 @@ func (repository AddressRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx,
 
 	addresses := []domain.Address{}
 
-	if rows.Next() {
+	for rows.Next() {
 		address := domain.Address{}
 		err := rows.Scan(&address.Id, &address.User.Id, &address.User.Username, &address.Name, &address.HandphoneNumber, &address.Street, &address.Districk, &address.PostCode, &address.Comment)
 		helper.PanicIfError(err)

@@ -54,6 +54,17 @@ func main() {
 	router.PUT("/api/carts/:productId", shoppingCartController.UpdateQty)
 	router.DELETE("/api/carts/:productId", shoppingCartController.DeleteCart)
 
+	//address
+	addressRepository := repository.NewAddressRepository()
+	addressSerice := service.NewAddressService(addressRepository, db)
+	addressController := controller.NewAddressController(addressSerice)
+
+	router.POST("/api/addresses", addressController.Create)
+	router.GET("/api/addresses/:addressId", addressController.FindById)
+	router.GET("/api/addresses", addressController.FindAll)
+	router.PUT("/api/addresses/:addressId", addressController.Update)
+	router.DELETE("/api/addresses/:addressId", addressController.Delete)
+
 	// router.PanicHandler = exception.ExceptionError
 
 	server := http.Server{
