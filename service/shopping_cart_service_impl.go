@@ -51,14 +51,15 @@ func (service ShoppingCartServiceImpl) UpdateQty(ctx context.Context, request we
 	return helper.ToCartResponse(cart)
 }
 
-func (service ShoppingCartServiceImpl) DeleteCart(ctx context.Context, userId int, productId int) {
+func (service ShoppingCartServiceImpl) DeleteCart(ctx context.Context, request []web.CartDeleteRequest) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 
 	defer helper.CommitOrRollbak(tx)
 
-	cart, err := service.CartRepository.FindById(ctx, tx, productId)
-	helper.PanicIfError(err)
+	// cart, err := service.CartRepository.FindById(ctx, tx, productId)
+	// helper.PanicIfError(err)
 
-	service.CartRepository.Delete(ctx, tx, cart.User.Id, cart.Product.Id)
+	carts := helper.ToCartsDelete(request)
+	service.CartRepository.Delete(ctx, tx, carts)
 }

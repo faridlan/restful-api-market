@@ -115,3 +115,107 @@ func ToAddressResponses(addresses []domain.Address) []web.AddressReponse {
 
 	return addressResponses
 }
+
+func ToOrderDetailResponse(order domain.OrderDetail) web.OrdersDetail {
+	return web.OrdersDetail{
+		ProductName: order.Product.ProductName,
+		Quantity:    order.Quantity,
+		Price:       order.UnitPrice,
+		TotalPrice:  order.TotalPrice,
+	}
+}
+
+func ToOrderDetailResponses(orders []domain.OrderDetail) []web.OrdersDetail {
+	var orderDetailResponses []web.OrdersDetail
+	for _, order := range orders {
+		orderDetailResponses = append(orderDetailResponses, ToOrderDetailResponse(order))
+	}
+
+	return orderDetailResponses
+}
+
+func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderResponse {
+	return web.OrderResponse{
+		OrderId: order.Id,
+		User: web.UserResponse{
+			Id:       order.User.Id,
+			Username: order.User.Username,
+		},
+		Address: web.AddressReponse{
+			// User:            web.UserResponse{},
+			Id:              order.Address.Id,
+			Name:            order.Address.Name,
+			HandphoneNumber: order.Address.HandphoneNumber,
+			Street:          order.Address.Street,
+			Districk:        order.Address.Districk,
+			PostCode:        order.Address.PostCode,
+			Comment:         order.Address.Comment,
+		},
+		Detail:    orders,
+		Total:     order.Total,
+		OrderDate: order.OrderDate,
+	}
+}
+
+func ToCreateOrder(order web.CreateOrder) domain.OrderDetail {
+	return domain.OrderDetail{
+		Order: domain.Order{
+			User: domain.User{
+				Id: order.UserId,
+			},
+		},
+		Product: domain.Product{
+			Id: order.ProductId,
+		},
+		Quantity: order.Quantity,
+	}
+}
+
+func ToCreateOrders(orders []web.CreateOrder) []domain.OrderDetail {
+	createOrders := []domain.OrderDetail{}
+	for _, order := range orders {
+		createOrders = append(createOrders, ToCreateOrder(order))
+	}
+
+	return createOrders
+}
+
+func ToCartDelete(cart web.CartDeleteRequest) domain.Cart {
+	return domain.Cart{
+		User: domain.User{
+			Id: cart.UserId,
+		},
+		Product: domain.Product{
+			Id: cart.ProductId,
+		},
+	}
+}
+
+func ToCartsDelete(carts []web.CartDeleteRequest) []domain.Cart {
+	cartRequest := []domain.Cart{}
+	for _, cart := range carts {
+		cartRequest = append(cartRequest, ToCartDelete(cart))
+	}
+
+	return cartRequest
+}
+
+func ToDeleteOrderCart(cart web.CreateOrder) domain.Cart {
+	return domain.Cart{
+		User: domain.User{
+			Id: cart.UserId,
+		},
+		Product: domain.Product{
+			Id: cart.ProductId,
+		},
+	}
+}
+
+func ToDeleteOrderCarts(carts []web.CreateOrder) []domain.Cart {
+	cartRequest := []domain.Cart{}
+	for _, cart := range carts {
+		cartRequest = append(cartRequest, ToDeleteOrderCart(cart))
+	}
+
+	return cartRequest
+}

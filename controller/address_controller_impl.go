@@ -22,8 +22,13 @@ func NewAddressController(addressService service.AddressService) AddressControll
 
 func (controller *AddressControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
+	claim := web.Claims{}
+	helper.ParseJwt(request, &claim)
+
 	addressCreateRequest := web.AddressCreateRequest{}
 	helper.ReadFromRequestBody(request, &addressCreateRequest)
+
+	addressCreateRequest.UserId = claim.Id
 
 	addressResponse := controller.AddressService.Create(request.Context(), addressCreateRequest)
 	webResponse := web.WebResponse{

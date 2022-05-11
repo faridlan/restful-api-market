@@ -37,10 +37,12 @@ func (repository CartRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, car
 	return cart
 }
 
-func (repository CartRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, userId int, productId int) {
+func (repository CartRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, carts []domain.Cart) {
 	SQL := "delete from carts where user_id = ? and product_id = ?"
-	_, err := tx.ExecContext(ctx, SQL, userId, productId)
-	helper.PanicIfError(err)
+	for _, cart := range carts {
+		_, err := tx.ExecContext(ctx, SQL, cart.User.Id, cart.Product.Id)
+		helper.PanicIfError(err)
+	}
 }
 
 func (repository CartRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Cart, error) {

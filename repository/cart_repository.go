@@ -10,7 +10,7 @@ import (
 type CartRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart
 	Update(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart
-	Delete(ctx context.Context, tx *sql.Tx, userId int, productId int)
+	Delete(ctx context.Context, tx *sql.Tx, carts []domain.Cart)
 	FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Cart, error)
 	FindAll(ctx context.Context, tx *sql.Tx, userId int) []domain.Cart
 }

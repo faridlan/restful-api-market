@@ -66,11 +66,20 @@ func (controller *ShoppingCartControllerImpl) DeleteCart(writer http.ResponseWri
 	claim := web.Claims{}
 	helper.ParseJwt(request, &claim)
 
-	productId := params.ByName("productId")
-	id, err := strconv.Atoi(productId)
-	helper.PanicIfError(err)
+	cartsDeleteRequest := web.CartsDeleteRequest{}
+	helper.ReadFromRequestBody(request, &cartsDeleteRequest)
 
-	controller.Service.DeleteCart(request.Context(), claim.Id, id)
+	carts := []web.CartDeleteRequest{}
+
+	for _, cart := range cartsDeleteRequest.Detail {
+		cart.UserId = claim.Id
+		carts = append(carts, cart)
+	}
+
+	cartDelete := web.CartsDeleteRequest{
+		Detail: carts,
+	}
+	controller.Service.DeleteCart(request.Context(), cartDelete.Detail)
 
 	webResponse := web.WebResponse{
 		Code:   200,

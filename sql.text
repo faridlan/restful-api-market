@@ -53,7 +53,7 @@ SQL QUERY
       from addresses where user_id = ?" 
   -order
     -/post 
-      -"insert into orders (user_id, addresses) values (?, ?);"
+      -"insert into orders (user_id, address_id) values (?, ?);"
 
       -"insert into detail_orders (order_id, product_id, quantity, price) values 
       ((select max(id) from orders where user_id = ?), ?, ?, (select price from product where id = ?))" (more than 1)
