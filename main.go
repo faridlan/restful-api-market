@@ -19,6 +19,16 @@ func main() {
 	validate := validator.New()
 	router := httprouter.New()
 
+	//Admin
+	//Product Feature
+	productRepository := repository.NewProdcutRepository()
+	productService := service.NewProductServie(productRepository, db)
+	productController := controller.NewProductController(productService)
+
+	router.POST("/api/products", productController.Create)
+	router.PUT("/api/products/:productId", productController.Update)
+	router.DELETE("/api/products/:productId", productController.Delete)
+
 	//auth
 	userRepository := repository.NewUserRepository()
 	blacklistRepository := repository.NewBlacklistRepository()
@@ -32,11 +42,10 @@ func main() {
 	router.PUT("/api/profile/:userId", userController.UpdateProfile)
 
 	//home
-	productRepository := repository.NewProdcutRepository()
 	homeService := service.NewHomeService(productRepository, db)
 	homeController := controller.NewHomeController(homeService)
 
-	router.GET("/api/home", homeController.Product)
+	router.GET("/api/admin/products", homeController.Product)
 
 	//product detail
 	cartRepository := repository.NewCartRepository()

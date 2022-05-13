@@ -17,15 +17,35 @@ func NewProdcutRepository() ProductRepository {
 }
 
 func (repository ProductRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
-	panic("not implemented") // TODO: Implement
+
+	SQL := "insert into products (product_name, category_id, price, quantity, image_url) values (?,?,?,?,?)"
+	result, err := tx.ExecContext(ctx, SQL, product.ProductName, product.CategoryId, product.Price, product.Quantity, product.ImageUrl)
+	helper.PanicIfError(err)
+
+	id, err := result.LastInsertId()
+	helper.PanicIfError(err)
+
+	product.Id = int(id)
+
+	return product
+
 }
 
 func (repository ProductRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
-	panic("not implemented") // TODO: Implement
+
+	SQL := "update products set product_name = ?, category_id = ?, price = ?, quantity = ?, image_url = ? where id = ?"
+	_, err := tx.ExecContext(ctx, SQL, product.ProductName, product.CategoryId, product.Price, product.Quantity, product.ImageUrl, product.Id)
+	helper.PanicIfError(err)
+
+	return product
 }
 
-func (repository ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, productId int) {
-	panic("not implemented") // TODO: Implement
+func (repository ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, product domain.Product) {
+
+	SQL := "delete from products where id = ?"
+	_, err := tx.ExecContext(ctx, SQL, product.Id)
+	helper.PanicIfError(err)
+
 }
 
 func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {

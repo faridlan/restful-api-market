@@ -95,7 +95,21 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		} else {
-			middleware.Handler.ServeHTTP(writer, request)
+			if request.URL.Path == "/api/admin" {
+				if claim.RoleId != 1 {
+					webResponse := web.WebResponse{
+						Code:   http.StatusUnauthorized,
+						Status: "UNAUTHORIZED",
+					}
+					helper.WriteToResponseBody(writer, webResponse)
+					writer.WriteHeader(http.StatusBadRequest)
+					return
+				} else {
+					middleware.Handler.ServeHTTP(writer, request)
+				}
+			} else {
+				middleware.Handler.ServeHTTP(writer, request)
+			}
 		}
 	}
 
