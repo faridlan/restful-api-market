@@ -29,6 +29,17 @@ func main() {
 	router.PUT("/api/products/:productId", productController.Update)
 	router.DELETE("/api/products/:productId", productController.Delete)
 
+	//Category
+	categoryRepository := repository.NewCategoryRepository()
+	categoryService := service.NewCategoryService(categoryRepository, db)
+	CategoryController := controller.NewCategoryController(categoryService)
+
+	router.POST("/api/categories", CategoryController.Create)
+	router.PUT("/api/categories/:categoryId", CategoryController.Update)
+	router.DELETE("/api/categories/:categoryId", CategoryController.Delete)
+	router.GET("/api/categories/:categoryId", CategoryController.FindById)
+	router.GET("/api/categories", CategoryController.FindAll)
+
 	//auth
 	userRepository := repository.NewUserRepository()
 	blacklistRepository := repository.NewBlacklistRepository()
@@ -45,7 +56,7 @@ func main() {
 	homeService := service.NewHomeService(productRepository, db)
 	homeController := controller.NewHomeController(homeService)
 
-	router.GET("/api/admin/products", homeController.Product)
+	router.GET("/api/products", homeController.Product)
 
 	//product detail
 	cartRepository := repository.NewCartRepository()

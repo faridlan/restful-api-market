@@ -219,3 +219,19 @@ func ToDeleteOrderCarts(carts []web.CreateOrder) []domain.Cart {
 
 	return cartRequest
 }
+
+func ToCategoryResponse(category domain.Category) web.CategoryResponse {
+	return web.CategoryResponse{
+		Id:           category.Id,
+		CategoryName: category.CategoryName,
+	}
+}
+
+func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
+	categoryResponses := []web.CategoryResponse{}
+	for _, category := range categories {
+		categoryResponses = append(categoryResponses, ToCategoryResponse(category))
+	}
+
+	return categoryResponses
+}
