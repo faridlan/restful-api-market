@@ -31,9 +31,11 @@ func (repository OrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, orde
 func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, orderId int, userId int) (domain.Order, error) {
 	SQL := `select o.id, u.username, 
 	a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
-	o.total, o.order_date from orders as o
+	o.total, o.order_date, s.status_name, p.image_url from orders as o
 	inner join users as u on u.id = o.user_id
 	inner join addresses as a on a.id = o.address_id
+	inner join status_order as s on s.id = o.status_id
+	left join payments as p on p.id = o.payment_id
 	where o.id = ? and o.user_id = ?`
 
 	rows, err := tx.QueryContext(ctx, SQL, orderId, userId)
@@ -88,6 +90,22 @@ func (repository OrderRepositoryImpl) UpdateTotal(ctx context.Context, tx *sql.T
 	WHERE orders_detail.order_id = (select max(orders.id) where orders.user_id = ?)`
 
 	_, err := tx.ExecContext(ctx, SQL, order.User.Id, order.User.Id)
+	helper.PanicIfError(err)
+
+	return order
+}
+
+func (repository OrderRepositoryImpl) UpdateStatus(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
+	SQL := "update orders set status_id = ? where id = ?"
+	_, err := tx.ExecContext(ctx, SQL, order.Status.Id, order.Id)
+	helper.PanicIfError(err)
+
+	return order
+}
+
+func (repository OrderRepositoryImpl) UpdatePayment(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
+	SQL := "update orders set payment_id = ? where id = ?"
+	_, err := tx.ExecContext(ctx, SQL, order.Payment.Id, order.Id)
 	helper.PanicIfError(err)
 
 	return order

@@ -10,10 +10,12 @@ type OrdersDetail struct {
 }
 
 type OrderResponse struct {
-	OrderId   int            `json:"order_id,omitempty"`
-	User      UserResponse   `json:"user,omitempty"`
-	Address   AddressReponse `json:"address,omitempty"`
-	Detail    []OrdersDetail `json:"detail,omitempty"`
-	Total     int            `json:"total,omitempty"`
-	OrderDate time.Time      `json:"order_date,omitempty"`
+	OrderId   int                 `json:"order_id,omitempty"`
+	User      UserResponse        `json:"user,omitempty"`
+	Address   AddressReponse      `json:"address,omitempty"`
+	Detail    []OrdersDetail      `json:"detail,omitempty"`
+	Total     int                 `json:"total,omitempty"`
+	OrderDate time.Time           `json:"order_date,omitempty"`
+	Status    StatusOrderResponse `json:"status_id,omitempty"`
+	Payment   PaymentResponse     `json:"payment_id,omitempty"`
 }

@@ -1,5 +1,6 @@
 package web
 
 type OrderUpdateRequest struct {
-	User UserResponse
+	OrderId   int `json:"order_id,omitempty"`
+	PaymentId int `json:"payment_id,omitempty"`
 }

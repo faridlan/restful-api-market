@@ -154,6 +154,14 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 		Detail:    orders,
 		Total:     order.Total,
 		OrderDate: order.OrderDate,
+		Status: web.StatusOrderResponse{
+			Id:         order.Status.Id,
+			StatusName: order.Status.StatusName,
+		},
+		Payment: web.PaymentResponse{
+			Id:       order.Payment.Id,
+			ImageUrl: order.Payment.ImageUrl,
+		},
 	}
 }
 
