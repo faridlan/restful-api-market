@@ -40,7 +40,7 @@ func (controller *ShippingAddressControllerImpl) CreateOrder(writer http.Respons
 		Detail:    detailOrders,
 	}
 
-	orderResponse := controller.ShippingAddressService.Order(request.Context(), orderCreate)
+	orderResponse := controller.ShippingAddressService.CreateOrder(request.Context(), orderCreate)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -69,5 +69,16 @@ func (controller *ShippingAddressControllerImpl) FindOrderById(writer http.Respo
 }
 
 func (controller *ShippingAddressControllerImpl) FindAllOrder(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	claim := web.Claims{}
+	helper.ParseJwt(request, &claim)
+
+	orderResponses := controller.ShippingAddressService.FindAllOrderByUser(request.Context(), claim.Id)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   orderResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

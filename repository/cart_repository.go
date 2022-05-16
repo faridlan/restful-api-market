@@ -12,5 +12,5 @@ type CartRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart
 	Delete(ctx context.Context, tx *sql.Tx, carts []domain.Cart)
 	FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Cart, error)
-	FindAll(ctx context.Context, tx *sql.Tx, userId int) []domain.Cart
+	FindAll(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Cart, error)
 }

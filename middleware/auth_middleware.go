@@ -1,26 +1,30 @@
 package middleware
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/faridlan/restful-api-market/app"
 	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
+	"github.com/faridlan/restful-api-market/repository"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v4"
 )
 
 type AuthMiddleware struct {
-	Handler http.Handler
+	Handler    http.Handler
+	Repository repository.BlacklistRepository
+	DB         *sql.DB
 }
 
-func NewAuthMiddleware(handler http.Handler) *AuthMiddleware {
+func NewAuthMiddleware(handler http.Handler, repository repository.BlacklistRepository, db *sql.DB) *AuthMiddleware {
 	return &AuthMiddleware{
-		Handler: handler,
+		Handler:    handler,
+		Repository: repository,
+		DB:         db,
 	}
 }
 
@@ -28,7 +32,7 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 
 	authorizationHeader := request.Header.Get("Authorization")
 
-	if request.URL.Path == "/api/login" || request.URL.Path == "/api/register" {
+	if request.URL.Path == "/api/users/login" || request.URL.Path == "/api/users/register" {
 		middleware.Handler.ServeHTTP(writer, request)
 		return
 	}
@@ -49,13 +53,18 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 	tokenString := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
 	//cek db
-	db := app.NewDB()
-	SQL := "select id,token from blacklist where token = ?"
-	rows, err := db.QueryContext(context.Background(), SQL, tokenString)
+	// db := app.NewDB()
+	// SQL := "select id,token from blacklist where token = ?"
+	// rows, err := db.QueryContext(context.Background(), SQL, tokenString)
+	// helper.PanicIfError(err)
+	// defer rows.Close()
+	tx, err := middleware.DB.Begin()
 	helper.PanicIfError(err)
-	defer rows.Close()
+	defer helper.CommitOrRollbak(tx)
 
-	if rows.Next() {
+	_, err = middleware.Repository.SelectById(request.Context(), tx, tokenString)
+
+	if err == nil {
 		//UNAUTHORIZED 401
 		writer.Header().Add("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusUnauthorized)

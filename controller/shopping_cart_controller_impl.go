@@ -20,6 +20,23 @@ func NewShoppingCartController(service service.ShoppingCartService) ShoppingCart
 	}
 }
 
+func (controller *ShoppingCartControllerImpl) AddToCart(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	claim := web.Claims{}
+	helper.ParseJwt(request, &claim)
+	cartCreateRequest := web.CartCreateRequest{}
+	cartCreateRequest.UserId = claim.Id
+	helper.ReadFromRequestBody(request, &cartCreateRequest)
+
+	cartResponse := controller.Service.AddToCart(request.Context(), cartCreateRequest)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   cartResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *ShoppingCartControllerImpl) FindCart(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	claim := web.Claims{}

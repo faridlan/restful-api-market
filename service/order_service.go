@@ -7,7 +7,7 @@ import (
 )
 
 type ShippingAddressService interface {
-	Order(ctx context.Context, request web.OrderCreateRequest) web.OrderResponse
+	CreateOrder(ctx context.Context, request web.OrderCreateRequest) web.OrderResponse
 	FindOrderById(ctx context.Context, orderId int, userId int) web.OrderResponse
 	FindAllOrderByUser(ctx context.Context, userId int) []web.OrderResponse
 }

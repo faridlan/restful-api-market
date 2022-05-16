@@ -59,7 +59,7 @@ func (repository CartRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, p
 	cart := domain.Cart{}
 
 	if rows.Next() {
-		err := rows.Scan(&cart.Id, &cart.User.Id, &cart.User.Username, &cart.Quantity, &cart.Product.Id, &cart.Product.ProductName, &cart.Product.Category, &cart.Product.Price, &cart.Product.Quantity, &cart.Product.ImageUrl)
+		err := rows.Scan(&cart.Id, &cart.User.Id, &cart.User.Username, &cart.Quantity, &cart.Product.Id, &cart.Product.ProductName, &cart.Product.Category.CategoryName, &cart.Product.Price, &cart.Product.Quantity, &cart.Product.ImageUrl)
 		helper.PanicIfError(err)
 
 		return cart, nil
@@ -68,7 +68,7 @@ func (repository CartRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, p
 	}
 }
 
-func (repository CartRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, userId int) []domain.Cart {
+func (repository CartRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Cart, error) {
 	SQL := `select c.id, u.id, u.username, c.quantity, p.id, p.product_name, ct.category_name, p.price, p.quantity, p.image_url from carts as c
 	left join products as p on p.id = c.product_id
 	left join categories as ct on ct.id = p.category_id
@@ -84,11 +84,15 @@ func (repository CartRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, us
 
 	for rows.Next() {
 		cart := domain.Cart{}
-		err := rows.Scan(&cart.Id, &cart.User.Id, &cart.User.Username, &cart.Quantity, &cart.Product.Id, &cart.Product.ProductName, &cart.Product.Category, &cart.Product.Price, &cart.Product.Quantity, &cart.Product.ImageUrl)
-		helper.PanicIfError(err)
+		if err = rows.Scan(&cart.Id, &cart.User.Id, &cart.User.Username, &cart.Quantity, &cart.Product.Id, &cart.Product.ProductName, &cart.Product.Category.CategoryName, &cart.Product.Price, &cart.Product.Quantity, &cart.Product.ImageUrl); err != nil {
+			return carts, err
+		}
 
 		carts = append(carts, cart)
 	}
+	if err = rows.Err(); err != nil {
+		return carts, err
+	}
 
-	return carts
+	return carts, nil
 }

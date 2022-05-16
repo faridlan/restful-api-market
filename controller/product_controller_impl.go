@@ -69,3 +69,29 @@ func (controller *ProductControllerImpl) Delete(writer http.ResponseWriter, requ
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *ProductControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productId := params.ByName("productId")
+	id, err := strconv.Atoi(productId)
+	helper.PanicIfError(err)
+
+	productResponse := controller.ProductService.FindyId(request.Context(), id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   productResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProductControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productResponses := controller.ProductService.FindAll(request.Context())
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   productResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

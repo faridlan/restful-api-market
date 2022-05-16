@@ -7,6 +7,7 @@ import (
 )
 
 type ShoppingCartService interface {
+	AddToCart(ctx context.Context, request web.CartCreateRequest) web.CartResponse
 	FindCart(ctx context.Context, userId int) []web.CartResponse
 	UpdateQty(ctx context.Context, request web.CartUpdateRequest) web.CartResponse
 	DeleteCart(ctx context.Context, request []web.CartDeleteRequest)

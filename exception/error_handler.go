@@ -1,10 +1,12 @@
 package exception
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
+	"github.com/go-playground/validator/v10"
 )
 
 func ExceptionError(writer http.ResponseWriter, request *http.Request, err interface{}) {
@@ -14,6 +16,10 @@ func ExceptionError(writer http.ResponseWriter, request *http.Request, err inter
 	}
 
 	if notFoundError(writer, request, err) {
+		return
+	}
+
+	if validationError(writer, request, err) {
 		return
 	}
 
@@ -32,6 +38,7 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+	fmt.Println(err)
 }
 
 func unauthError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
@@ -76,4 +83,24 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err interf
 		return false
 	}
 
+}
+
+func validationError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
+	exception, ok := err.(validator.ValidationErrors)
+	if ok {
+		writer.Header().Add("content-type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+
+		webResponse := web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Data:   exception.Error(),
+		}
+
+		helper.WriteToResponseBody(writer, webResponse)
+
+		return true
+	} else {
+		return false
+	}
 }

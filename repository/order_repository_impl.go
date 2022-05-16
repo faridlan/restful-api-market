@@ -29,14 +29,22 @@ func (repository OrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, orde
 }
 
 func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, orderId int, userId int) (domain.Order, error) {
-	SQL := `select o.id, u.username, 
+	SQL := `select o.id, u.username,
 	a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
-	o.total, o.order_date, s.status_name, p.image_url from orders as o
+	o.total, o.order_date from orders as o
 	inner join users as u on u.id = o.user_id
 	inner join addresses as a on a.id = o.address_id
-	inner join status_order as s on s.id = o.status_id
-	left join payments as p on p.id = o.payment_id
 	where o.id = ? and o.user_id = ?`
+
+	//NEED TO CONVERTING NULL
+	// SQL := `select o.id, u.username,
+	// a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
+	// o.total, o.order_date, s.status_name, p.image_url from orders as o
+	// inner join users as u on u.id = o.user_id
+	// inner join addresses as a on a.id = o.address_id
+	// inner join status_order as s on s.id = o.status_id
+	// left join payments as p on p.id = o.payment_id
+	// where o.id = ? and o.user_id = ?`
 
 	rows, err := tx.QueryContext(ctx, SQL, orderId, userId)
 	helper.PanicIfError(err)
@@ -46,6 +54,9 @@ func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 	order := domain.Order{}
 	if rows.Next() {
 		err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate)
+
+		//NEED TO CONVERTING NULL
+		// err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate, &order.Status.StatusName, &order.Payment.ImageUrl)
 		helper.PanicIfError(err)
 
 		return order, nil

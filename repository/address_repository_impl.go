@@ -29,7 +29,7 @@ func (repository AddressRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, ad
 
 func (repository AddressRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address {
 	SQL := "update addresses set name = ?, handphone_number = ?, street = ?, districk = ?, post_code = ?, comment = ? where id =? and user_id =?"
-	_, err := tx.ExecContext(ctx, SQL, address.Name, address.HandphoneNumber, address.Street, address.Districk, address.PostCode, address.Comment, address.User.Id, address.Id)
+	_, err := tx.ExecContext(ctx, SQL, address.Name, address.HandphoneNumber, address.Street, address.Districk, address.PostCode, address.Comment, address.Id, address.User.Id)
 	helper.PanicIfError(err)
 
 	return address

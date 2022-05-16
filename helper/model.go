@@ -46,11 +46,13 @@ func ToProductResponse(product domain.Product) web.ProductResponse {
 	return web.ProductResponse{
 		Id:          product.Id,
 		ProductName: product.ProductName,
-		CategoryId:  product.CategoryId,
-		Category:    product.Category,
-		Price:       product.Price,
-		Quantity:    product.Quantity,
-		ImageUrl:    product.ImageUrl,
+		Category: web.CategoryResponse{
+			Id:           product.Category.Id,
+			CategoryName: product.Category.CategoryName,
+		},
+		Price:    product.Price,
+		Quantity: product.Quantity,
+		ImageUrl: product.ImageUrl,
 	}
 }
 
@@ -73,10 +75,13 @@ func ToCartResponse(cart domain.Cart) web.CartResponse {
 		Product: web.ProductResponse{
 			Id:          cart.Product.Id,
 			ProductName: cart.Product.ProductName,
-			Category:    cart.Product.Category,
-			Price:       cart.Product.Price,
-			Quantity:    cart.Product.Quantity,
-			ImageUrl:    cart.Product.ImageUrl,
+			Category: web.CategoryResponse{
+				Id:           cart.Product.Category.Id,
+				CategoryName: cart.Product.Category.CategoryName,
+			},
+			Price:    cart.Product.Price,
+			Quantity: cart.Product.Quantity,
+			ImageUrl: cart.Product.ImageUrl,
 		},
 		Quantity: cart.Quantity,
 	}
@@ -163,6 +168,32 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 			ImageUrl: order.Payment.ImageUrl,
 		},
 	}
+}
+
+func ToOrdersResponse(order domain.Order) web.OrderResponse {
+	return web.OrderResponse{
+		OrderId: order.Id,
+		User: web.UserResponse{
+			Id:       order.User.Id,
+			Username: order.User.Username,
+		},
+		Total:     order.Total,
+		OrderDate: order.OrderDate,
+		Status: web.StatusOrderResponse{
+			Id:         order.Status.Id,
+			StatusName: order.Status.StatusName,
+		},
+		// Payment:   web.PaymentResponse{},
+	}
+}
+
+func ToOrdersResponses(orders []domain.Order) []web.OrderResponse {
+	ordersResponses := []web.OrderResponse{}
+	for _, order := range orders {
+		ordersResponses = append(ordersResponses, ToOrdersResponse(order))
+	}
+
+	return ordersResponses
 }
 
 func ToCreateOrder(order web.CreateOrder) domain.OrderDetail {

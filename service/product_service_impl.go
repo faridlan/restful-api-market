@@ -29,10 +29,12 @@ func (service ProductServiceImpl) Create(ctx context.Context, request web.Produc
 
 	product := domain.Product{
 		ProductName: request.ProductName,
-		CategoryId:  request.CategoryId,
-		Price:       request.Price,
-		Quantity:    request.Quantity,
-		ImageUrl:    request.ImageUrl,
+		Category: domain.Category{
+			Id: request.CategoryId,
+		},
+		Price:    request.Price,
+		Quantity: request.Quantity,
+		ImageUrl: request.ImageUrl,
 	}
 
 	product = service.ProductRepository.Save(ctx, tx, product)
@@ -49,7 +51,7 @@ func (service ProductServiceImpl) Update(ctx context.Context, request web.Produc
 	helper.PanicIfError(err)
 
 	product.ProductName = request.ProductName
-	product.CategoryId = request.CategoryId
+	product.Category.Id = request.CategoryId
 	product.Price = request.Price
 	product.Quantity = request.Quantity
 	product.ImageUrl = request.ImageUrl
@@ -70,12 +72,23 @@ func (service ProductServiceImpl) Delete(ctx context.Context, productId int) {
 	service.ProductRepository.Delete(ctx, tx, product)
 }
 
-func (repository ProductServiceImpl) FindAll(ctx context.Context) []web.ProductResponse {
-	tx, err := repository.DB.Begin()
+func (service ProductServiceImpl) FindyId(ctx context.Context, productId int) web.ProductResponse {
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	productResponses := repository.ProductRepository.FindAll(ctx, tx)
+	product, err := service.ProductRepository.FindById(ctx, tx, productId)
+	helper.PanicIfError(err)
+
+	return helper.ToProductResponse(product)
+}
+
+func (service ProductServiceImpl) FindAll(ctx context.Context) []web.ProductResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	productResponses := service.ProductRepository.FindAll(ctx, tx)
 
 	return helper.ToProductResponses(productResponses)
 }

@@ -28,7 +28,7 @@ func NewShippingAddressService(productRepo repository.ProductRepository, orderRe
 	}
 }
 
-func (service ShippingAddressServiceImpl) Order(ctx context.Context, request web.OrderCreateRequest) web.OrderResponse {
+func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, request web.OrderCreateRequest) web.OrderResponse {
 
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
@@ -110,5 +110,12 @@ func (service ShippingAddressServiceImpl) FindOrderById(ctx context.Context, ord
 }
 
 func (service ShippingAddressServiceImpl) FindAllOrderByUser(ctx context.Context, userId int) []web.OrderResponse {
-	panic("not implemented") // TODO: Implement
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	orders, err := service.OrderRepo.FindByUserId(ctx, tx, userId)
+	helper.PanicIfError(err)
+
+	return helper.ToOrdersResponses(orders)
 }
