@@ -6,7 +6,10 @@ import (
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	enTranslations "github.com/go-playground/validator/v10/translations/en"
 )
 
 func ExceptionError(writer http.ResponseWriter, request *http.Request, err interface{}) {
@@ -85,16 +88,42 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err interf
 
 }
 
+// func translateError(err error, trans ut.Translator) (errs []error) {
+// 	if err == nil {
+// 		return nil
+// 	}
+// 	validatorErrs := err.(validator.ValidationErrors)
+// 	for _, e := range validatorErrs {
+// 		translatedErr := fmt.Errorf(e.Translate(trans))
+// 		errs = append(errs, translatedErr)
+// 	}
+// 	return errs
+// }
+
 func validationError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
 	exception, ok := err.(validator.ValidationErrors)
+
 	if ok {
 		writer.Header().Add("content-type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
 
+		validate := validator.New()
+		english := en.New()
+		uni := ut.New(english, english)
+		trans, _ := uni.GetTranslator("en")
+		_ = enTranslations.RegisterDefaultTranslations(validate, trans)
+
+		var errs []interface{}
+
+		for _, v := range exception {
+			translateErr := v.Translate(trans)
+			errs = append(errs, translateErr)
+		}
+
 		webResponse := web.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   exception.Error(),
+			Data:   errs,
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)

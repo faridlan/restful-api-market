@@ -20,12 +20,12 @@ func main() {
 	//Admin
 	//Product Feature
 	productRepository := repository.NewProdcutRepository()
-	productService := service.NewProductServie(productRepository, db)
+	productService := service.NewProductServie(productRepository, db, validate)
 	productController := controller.NewProductController(productService)
 
 	//Category
 	categoryRepository := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(categoryRepository, db)
+	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	CategoryController := controller.NewCategoryController(categoryService)
 
 	//auth
@@ -38,18 +38,18 @@ func main() {
 	cartRepository := repository.NewCartRepository()
 
 	//shopping cart
-	shoppingCartService := service.NewShoppingCartService(cartRepository, db)
+	shoppingCartService := service.NewShoppingCartService(cartRepository, db, validate)
 	shoppingCartController := controller.NewShoppingCartController(shoppingCartService)
 
 	//address
 	addressRepository := repository.NewAddressRepository()
-	addressSerice := service.NewAddressService(addressRepository, db)
+	addressSerice := service.NewAddressService(addressRepository, db, validate)
 	addressController := controller.NewAddressController(addressSerice)
 
 	//shipping address
 	orderRepository := repository.NewOrderRepository()
 	orderDetailRepository := repository.NewOrderDetailRepository()
-	shippingAddressService := service.NewShippingAddressService(productRepository, orderRepository, orderDetailRepository, cartRepository, db)
+	shippingAddressService := service.NewShippingAddressService(productRepository, orderRepository, orderDetailRepository, cartRepository, db, validate)
 	shippingAddressController := controller.NewShippingAddressController(shippingAddressService)
 
 	controller := app.ControllerRouter{

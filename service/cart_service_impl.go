@@ -8,21 +8,27 @@ import (
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type ShoppingCartServiceImpl struct {
 	CartRepository repository.CartRepository
 	DB             *sql.DB
+	Validate       *validator.Validate
 }
 
-func NewShoppingCartService(CartRepository repository.CartRepository, DB *sql.DB) ShoppingCartService {
+func NewShoppingCartService(CartRepository repository.CartRepository, DB *sql.DB, validate *validator.Validate) ShoppingCartService {
 	return ShoppingCartServiceImpl{
 		CartRepository: CartRepository,
 		DB:             DB,
+		Validate:       validate,
 	}
 }
 
 func (service ShoppingCartServiceImpl) AddToCart(ctx context.Context, request web.CartCreateRequest) web.CartResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 
@@ -56,6 +62,9 @@ func (service ShoppingCartServiceImpl) FindCart(ctx context.Context, userId int)
 }
 
 func (service ShoppingCartServiceImpl) UpdateQty(ctx context.Context, request web.CartUpdateRequest) web.CartResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 
@@ -74,6 +83,9 @@ func (service ShoppingCartServiceImpl) UpdateQty(ctx context.Context, request we
 }
 
 func (service ShoppingCartServiceImpl) DeleteCart(ctx context.Context, request []web.CartDeleteRequest) {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 

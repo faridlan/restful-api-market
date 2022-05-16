@@ -8,17 +8,20 @@ import (
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type ProductServiceImpl struct {
 	ProductRepository repository.ProductRepository
 	DB                *sql.DB
+	Validate          *validator.Validate
 }
 
-func NewProductServie(productRepository repository.ProductRepository, DB *sql.DB) ProductService {
+func NewProductServie(productRepository repository.ProductRepository, DB *sql.DB, validate *validator.Validate) ProductService {
 	return ProductServiceImpl{
 		ProductRepository: productRepository,
 		DB:                DB,
+		Validate:          validate,
 	}
 }
 

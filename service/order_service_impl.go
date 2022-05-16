@@ -8,6 +8,7 @@ import (
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type ShippingAddressServiceImpl struct {
@@ -16,19 +17,23 @@ type ShippingAddressServiceImpl struct {
 	OrderDetailRepo repository.OrderDetailRepository
 	CartRepo        repository.CartRepository
 	DB              *sql.DB
+	Validate        *validator.Validate
 }
 
-func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, DB *sql.DB) ShippingAddressService {
+func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, DB *sql.DB, validate *validator.Validate) ShippingAddressService {
 	return ShippingAddressServiceImpl{
 		ProductRepo:     productRepo,
 		OrderRepo:       orderRepo,
 		OrderDetailRepo: orderDetailRepo,
 		CartRepo:        cartRepo,
 		DB:              DB,
+		Validate:        validate,
 	}
 }
 
 func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, request web.OrderCreateRequest) web.OrderResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
 
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)

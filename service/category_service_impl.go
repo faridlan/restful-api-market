@@ -8,21 +8,27 @@ import (
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/repository"
+	"github.com/go-playground/validator/v10"
 )
 
 type CategoryServiceImpl struct {
 	CategoryRepo repository.CategoryRepository
 	Db           *sql.DB
+	Validate     *validator.Validate
 }
 
-func NewCategoryService(categoryRepo repository.CategoryRepository, db *sql.DB) CategoryService {
+func NewCategoryService(categoryRepo repository.CategoryRepository, db *sql.DB, validate *validator.Validate) CategoryService {
 	return CategoryServiceImpl{
 		CategoryRepo: categoryRepo,
 		Db:           db,
+		Validate:     validate,
 	}
 }
 
 func (service CategoryServiceImpl) Create(ctx context.Context, request web.CategoryCreateRequest) web.CategoryResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -37,6 +43,9 @@ func (service CategoryServiceImpl) Create(ctx context.Context, request web.Categ
 }
 
 func (service CategoryServiceImpl) Update(ctx context.Context, request web.CategoryUpdateRequest) web.CategoryResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
