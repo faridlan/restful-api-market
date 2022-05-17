@@ -8,7 +8,11 @@ import (
 )
 
 func NewDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/e_market?parseTime=true")
+	// port := os.Getenv("PORT")
+	// host := os.Getenv("HOST")
+
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:3307)/e_market?parseTime=true")
+	// db, err := sql.Open("mysql", fmt.Sprintf("root:root@tcp(%s:%s)/belajar_golang", host, port))
 	helper.PanicIfError(err)
 
 	db.SetConnMaxIdleTime(10 * time.Minute)
