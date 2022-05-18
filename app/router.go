@@ -13,6 +13,7 @@ type ControllerRouter struct {
 	ProductController         controller.ProductController
 	ShippingAddressController controller.ShippingAddressController
 	ShoppingCartController    controller.ShoppingCartController
+	StatusOrderController     controller.StatusOrderController
 }
 
 func NewRouter(controller ControllerRouter) *httprouter.Router {
@@ -52,6 +53,13 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/carts", controller.ShoppingCartController.FindCart)
 	router.PUT("/api/carts/:productId", controller.ShoppingCartController.UpdateQty)
 	router.DELETE("/api/carts", controller.ShoppingCartController.DeleteCart)
+
+	//statusOrder
+	router.POST("/api/statusOrder", controller.StatusOrderController.Create)
+	router.PUT("/api/statusOrder/:statusId", controller.StatusOrderController.Update)
+	router.DELETE("/api/statusOrder/:statusId", controller.StatusOrderController.Delete)
+	router.GET("/api/statusOrder/:statusId", controller.StatusOrderController.FindById)
+	router.GET("/api/statusOrder", controller.StatusOrderController.FindAll)
 
 	router.PanicHandler = exception.ExceptionError
 
