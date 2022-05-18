@@ -12,22 +12,26 @@ import (
 type StatusOrderRepositoryImpl struct {
 }
 
-func (repository StatusOrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, statusCode domain.StatusCode) domain.StatusCode {
+func NewStatusOrderRepository() StatusOrderRepository {
+	return StatusOrderRepositoryImpl{}
+}
+
+func (repository StatusOrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, statusOrder domain.StatusOrder) domain.StatusOrder {
 
 	SQL := "insert into status_order (status_name) values (?)"
-	result, err := tx.ExecContext(ctx, SQL, statusCode.StatusName)
+	result, err := tx.ExecContext(ctx, SQL, statusOrder.StatusName)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	statusCode.Id = int(id)
+	statusOrder.Id = int(id)
 
-	return statusCode
+	return statusOrder
 
 }
 
-func (repository StatusOrderRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, statusCode domain.StatusCode) domain.StatusCode {
+func (repository StatusOrderRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, statusCode domain.StatusOrder) domain.StatusOrder {
 
 	SQL := "update status_order set status_name = ? where id = ?"
 	_, err := tx.ExecContext(ctx, SQL, statusCode.StatusName, statusCode.Id)
@@ -37,7 +41,7 @@ func (repository StatusOrderRepositoryImpl) Update(ctx context.Context, tx *sql.
 
 }
 
-func (repository StatusOrderRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, statusCode domain.StatusCode) {
+func (repository StatusOrderRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, statusCode domain.StatusOrder) {
 
 	SQL := "delete from status_order where id = ?"
 	_, err := tx.ExecContext(ctx, SQL, statusCode.Id)
@@ -45,7 +49,7 @@ func (repository StatusOrderRepositoryImpl) Delete(ctx context.Context, tx *sql.
 
 }
 
-func (repository StatusOrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, statusId int) (domain.StatusCode, error) {
+func (repository StatusOrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, statusId int) (domain.StatusOrder, error) {
 
 	SQL := "select id, status_name from status_order where id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, statusId)
@@ -53,7 +57,7 @@ func (repository StatusOrderRepositoryImpl) FindById(ctx context.Context, tx *sq
 
 	defer rows.Close()
 
-	status := domain.StatusCode{}
+	status := domain.StatusOrder{}
 
 	if rows.Next() {
 		err := rows.Scan(&status.Id, &status.StatusName)
@@ -66,7 +70,7 @@ func (repository StatusOrderRepositoryImpl) FindById(ctx context.Context, tx *sq
 
 }
 
-func (repository StatusOrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.StatusCode {
+func (repository StatusOrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.StatusOrder {
 
 	SQL := "select id, status_name from status_order"
 	rows, err := tx.QueryContext(ctx, SQL)
@@ -74,10 +78,10 @@ func (repository StatusOrderRepositoryImpl) FindAll(ctx context.Context, tx *sql
 
 	defer rows.Close()
 
-	statusAll := []domain.StatusCode{}
+	statusAll := []domain.StatusOrder{}
 
 	for rows.Next() {
-		status := domain.StatusCode{}
+		status := domain.StatusOrder{}
 		err := rows.Scan(&status.Id, &status.StatusName)
 		helper.PanicIfError(err)
 

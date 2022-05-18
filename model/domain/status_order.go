@@ -1,6 +1,6 @@
 package domain
 
-type StatusCode struct {
+type StatusOrder struct {
 	Id         int
 	StatusName string
 }

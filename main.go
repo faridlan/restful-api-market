@@ -52,6 +52,11 @@ func main() {
 	shippingAddressService := service.NewShippingAddressService(productRepository, orderRepository, orderDetailRepository, cartRepository, db, validate)
 	shippingAddressController := controller.NewShippingAddressController(shippingAddressService)
 
+	//Status Order
+	statusOrderRepository := repository.NewStatusOrderRepository()
+	statusOrderService := service.NewStatusOrderService(statusOrderRepository, db, validate)
+	statusOrderContoller := controller.NewStatusOrderController(statusOrderService)
+
 	controller := app.ControllerRouter{
 		AddressController:         addressController,
 		AuthController:            authController,
@@ -59,6 +64,7 @@ func main() {
 		ProductController:         productController,
 		ShippingAddressController: shippingAddressController,
 		ShoppingCartController:    shoppingCartController,
+		StatusOrderController:     statusOrderContoller,
 	}
 
 	blacklist := repository.NewBlacklistRepository()

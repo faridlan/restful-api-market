@@ -274,3 +274,19 @@ func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
 
 	return categoryResponses
 }
+
+func ToStatusOrderResponse(statusOrder domain.StatusOrder) web.StatusOrderResponse {
+	return web.StatusOrderResponse{
+		Id:         statusOrder.Id,
+		StatusName: statusOrder.StatusName,
+	}
+}
+
+func ToStatusOrderResponses(statusOrders []domain.StatusOrder) []web.StatusOrderResponse {
+	statusOrderResponses := []web.StatusOrderResponse{}
+	for _, statusOrder := range statusOrders {
+		statusOrderResponses = append(statusOrderResponses, ToStatusOrderResponse(statusOrder))
+	}
+	return statusOrderResponses
+
+}
