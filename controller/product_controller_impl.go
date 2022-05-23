@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -94,4 +95,31 @@ func (controller *ProductControllerImpl) FindAll(writer http.ResponseWriter, req
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProductControllerImpl) CreateImg(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	err := request.ParseMultipartForm(10 << 20)
+	helper.PanicIfError(err)
+
+	file, _, err := request.FormFile("productImage")
+	helper.PanicIfError(err)
+	defer file.Close()
+
+	fileBytes, err := ioutil.ReadAll(file)
+	helper.PanicIfError(err)
+
+	image := web.ProductCreateRequest{
+		ImageUrl: string(fileBytes),
+	}
+
+	productResponse := controller.ProductService.CreateImg(request.Context(), image)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   productResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
 }

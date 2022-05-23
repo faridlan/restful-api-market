@@ -3,7 +3,10 @@ package service
 import (
 	"context"
 	"database/sql"
+	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -123,4 +126,68 @@ func (service ShippingAddressServiceImpl) FindAllOrderByUser(ctx context.Context
 	helper.PanicIfError(err)
 
 	return helper.ToOrdersResponses(orders)
+}
+
+func (service ShippingAddressServiceImpl) UpdateStatus(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
+	order, err := service.OrderRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	helper.PanicIfError(err)
+
+	order.Status.Id = request.StatusId
+	order.Id = request.OrderId
+	order.User.Id = request.UserId
+
+	order = service.OrderRepo.UpdateStatus(ctx, tx, order)
+
+	return helper.ToOrderResponse(order, ordersDetail)
+}
+
+func (service ShippingAddressServiceImpl) UpdatePayment(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	// stringX := helper.NewNullString(request.Payment)
+
+	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
+	order, err := service.OrderRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	helper.PanicIfError(err)
+
+	order.Status.Id = request.StatusId
+	// order.Payment = stringX
+	order.Id = request.OrderId
+	order.User.Id = request.UserId
+
+	order = service.OrderRepo.UpdatePayment(ctx, tx, order)
+	order = service.OrderRepo.UpdateStatus(ctx, tx, order)
+
+	return helper.ToOrderResponse(order, ordersDetail)
+
+}
+
+func (service ShippingAddressServiceImpl) UploadImage(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponseImg {
+	random := helper.RandStringRunes(10)
+	s3Client, endpoint := helper.S3Config()
+
+	object := s3.PutObjectInput{
+		Bucket: aws.String("olshop"),
+		Key:    aws.String("/payments/" + random + ".png"),
+		Body:   strings.NewReader(string(request.Payment)),
+		ACL:    aws.String("public-read"),
+	}
+
+	_, err := s3Client.PutObject(&object)
+	helper.PanicIfError(err)
+
+	image := web.OrderResponseImg{
+		Image: "https://" + endpoint + *object.Key,
+	}
+
+	return image
 }

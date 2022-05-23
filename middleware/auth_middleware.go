@@ -8,6 +8,7 @@ import (
 
 	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
+	"github.com/faridlan/restful-api-market/model"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/repository"
 	_ "github.com/go-sql-driver/mysql"
@@ -39,7 +40,6 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 
 	if !strings.Contains(authorizationHeader, "Bearer") {
 		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
 		writer.WriteHeader(http.StatusUnauthorized)
 		webResponse := web.WebResponse{
 			Code:   http.StatusUnauthorized,
@@ -52,12 +52,6 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 
 	tokenString := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
-	//cek db
-	// db := app.NewDB()
-	// SQL := "select id,token from blacklist where token = ?"
-	// rows, err := db.QueryContext(context.Background(), SQL, tokenString)
-	// helper.PanicIfError(err)
-	// defer rows.Close()
 	tx, err := middleware.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -104,21 +98,23 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		} else {
-			if request.URL.Path == "/api/admin" {
-				if claim.RoleId != 1 {
+
+			endpoints := model.Endpoints()
+			for _, e := range endpoints {
+				if request.URL.Path == e.Url && request.Method == e.Method && claim.RoleId != 1 {
+					writer.Header().Add("Content-Type", "application/json")
+					writer.WriteHeader(http.StatusUnauthorized)
 					webResponse := web.WebResponse{
 						Code:   http.StatusUnauthorized,
 						Status: "UNAUTHORIZED",
 					}
 					helper.WriteToResponseBody(writer, webResponse)
-					writer.WriteHeader(http.StatusBadRequest)
 					return
-				} else {
-					middleware.Handler.ServeHTTP(writer, request)
 				}
-			} else {
-				middleware.Handler.ServeHTTP(writer, request)
 			}
+
+			middleware.Handler.ServeHTTP(writer, request)
+
 		}
 	}
 

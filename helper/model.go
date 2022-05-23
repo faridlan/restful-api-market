@@ -163,10 +163,7 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 			Id:         order.Status.Id,
 			StatusName: order.Status.StatusName,
 		},
-		Payment: web.PaymentResponse{
-			Id:       order.Payment.Id,
-			ImageUrl: order.Payment.ImageUrl,
-		},
+		Payment: order.Payment,
 	}
 }
 

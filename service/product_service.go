@@ -12,4 +12,5 @@ type ProductService interface {
 	Delete(ctx context.Context, productId int)
 	FindyId(ctx context.Context, productId int) web.ProductResponse
 	FindAll(ctx context.Context) []web.ProductResponse
+	CreateImg(ctx context.Context, request web.ProductCreateRequest) web.ProductResponse
 }

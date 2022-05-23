@@ -3,7 +3,10 @@ package service
 import (
 	"context"
 	"database/sql"
+	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -94,4 +97,27 @@ func (service ProductServiceImpl) FindAll(ctx context.Context) []web.ProductResp
 	productResponses := service.ProductRepository.FindAll(ctx, tx)
 
 	return helper.ToProductResponses(productResponses)
+}
+
+func (servicer ProductServiceImpl) CreateImg(ctx context.Context, request web.ProductCreateRequest) web.ProductResponse {
+
+	random := helper.RandStringRunes(10)
+	s3Client, endpoint := helper.S3Config()
+
+	object := s3.PutObjectInput{
+		Bucket: aws.String("olshop"),
+		Key:    aws.String("/products/" + random + ".png"),
+		Body:   strings.NewReader(string(request.ImageUrl)),
+		ACL:    aws.String("public-read"),
+	}
+
+	_, err := s3Client.PutObject(&object)
+	helper.PanicIfError(err)
+
+	image := web.ProductResponse{
+		ImageUrl: "https://" + endpoint + *object.Key,
+	}
+
+	return image
+
 }
