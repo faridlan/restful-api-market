@@ -6,6 +6,10 @@ type UserResponse struct {
 	Id       int               `json:"id,omitempty"`
 	Username string            `json:"username,omitempty"`
 	Email    string            `json:"email,omitempty"`
-	ImageUrl *model.NullString `json:"image_url,omitempty"`
+	ImageUrl *model.NullString `json:"image_url"`
 	RoleId   int               `json:"role_id,omitempty"`
+}
+
+type UserResponseImg struct {
+	ImageUrl string `json:"image_url,omitempty"`
 }

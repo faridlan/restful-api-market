@@ -3,7 +3,10 @@ package service
 import (
 	"context"
 	"database/sql"
+	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -32,6 +35,8 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
+	stringImg := helper.NewNullString(request.ImageUrl)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -40,8 +45,8 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 		Username: request.Username,
 		Email:    request.Email,
 		Password: request.Password,
-		// 	ImageUrl: request.ImageUrl,
-		// 	RoleId:   request.RoleId,
+		ImageUrl: stringImg,
+		RoleId:   request.RoleId,
 	}
 
 	user = service.UserRepository.Save(ctx, tx, user)
@@ -98,12 +103,14 @@ func (service AuthServiceImpl) UpdateProfile(ctx context.Context, request web.Us
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	stringImg := helper.NewNullString(request.ImageUrl)
+
 	user, err := service.UserRepository.FindById(ctx, tx, request.Id)
 	helper.PanicIfError(err)
 
 	user.Username = request.Username
 	user.Email = request.Email
-	user.ImageUrl = request.ImageUrl
+	user.ImageUrl = stringImg
 
 	user = service.UserRepository.Update(ctx, tx, user)
 
@@ -132,4 +139,25 @@ func (service AuthServiceImpl) FindAll(ctx context.Context) []web.UserResponse {
 	users := service.UserRepository.FindAll(ctx, tx)
 
 	return helper.ToUserResponses(users)
+}
+
+func (service AuthServiceImpl) UploadImage(ctx context.Context, request web.UserCreateRequest) web.UserResponseImg {
+	random := helper.RandStringRunes(10)
+	s3Client, endpoint := helper.S3Config()
+
+	object := s3.PutObjectInput{
+		Bucket: aws.String("olshop"),
+		Key:    aws.String("/profiles/" + random + ".png"),
+		Body:   strings.NewReader(string(request.ImageUrl)),
+		ACL:    aws.String("public-read"),
+	}
+
+	_, err := s3Client.PutObject(&object)
+	helper.PanicIfError(err)
+
+	image := web.UserResponseImg{
+		ImageUrl: "https://" + *object.Bucket + "." + endpoint + *object.Key,
+	}
+
+	return image
 }

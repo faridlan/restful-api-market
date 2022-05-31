@@ -33,7 +33,7 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 
 	authorizationHeader := request.Header.Get("Authorization")
 
-	if request.URL.Path == "/api/users/login" || request.URL.Path == "/api/users/register" {
+	if request.URL.Path == "/api/login" || request.URL.Path == "/api/register" {
 		middleware.Handler.ServeHTTP(writer, request)
 		return
 	}

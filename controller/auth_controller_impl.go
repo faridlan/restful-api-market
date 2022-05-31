@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -56,12 +57,27 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *AuthControllerImpl) Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *AuthControllerImpl) MyProfile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	claim := &web.Claims{}
 	claims := helper.ParseJwt(request, claim)
 
 	userResponse := controller.AuthService.Profile(request.Context(), claims.Id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller AuthControllerImpl) Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userId := params.ByName("userId")
+	id, err := strconv.Atoi(userId)
+	helper.PanicIfError(err)
+
+	userResponse := controller.AuthService.Profile(request.Context(), id)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -113,11 +129,36 @@ func (controller *AuthControllerImpl) Logout(writer http.ResponseWriter, request
 	}
 
 	controller.AuthService.Logout(request.Context(), blacklistCreate)
-
+	writer.WriteHeader(http.StatusUnauthorized)
 	webResponse := web.WebResponse{
 		Code:   http.StatusUnauthorized,
 		Status: "UNAUTHORIZED",
 		Data:   nil,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *AuthControllerImpl) CreateImg(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	err := request.ParseMultipartForm(10 << 20)
+	helper.PanicIfError(err)
+
+	file, _, err := request.FormFile("profileImage")
+	helper.PanicIfError(err)
+	defer file.Close()
+
+	fileBytes, err := ioutil.ReadAll(file)
+	helper.PanicIfError(err)
+
+	image := web.UserCreateRequest{
+		ImageUrl: string(fileBytes),
+	}
+
+	userResponse := controller.AuthService.UploadImage(request.Context(), image)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

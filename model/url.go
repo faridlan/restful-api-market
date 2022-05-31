@@ -8,6 +8,14 @@ type Endpoint struct {
 func Endpoints() []Endpoint {
 	url := []Endpoint{
 		{
+			Url:    "/api/profiles",
+			Method: "GET",
+		},
+		{
+			Url:    "/api/profile/:userId",
+			Method: "GET",
+		},
+		{
 			Url:    "/api/categories",
 			Method: "POST",
 		},

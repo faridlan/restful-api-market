@@ -13,5 +13,6 @@ type AuthService interface {
 	UpdateProfile(ctx context.Context, request web.UserUpdateRequest) web.UserResponse
 	FindAll(ctx context.Context) []web.UserResponse
 	Logout(ctx context.Context, request web.BlacklistCreateRequest) web.BlacklistResponse
+	UploadImage(ctx context.Context, request web.UserCreateRequest) web.UserResponseImg
 	// ChangePassword(ctx context.Context, request)
 }

@@ -21,20 +21,21 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router := httprouter.New()
 
 	//ADDRESS
-	router.POST("/api/users/addresses", controller.AddressController.Create)
-	router.GET("/api/users/addresses/:addressId", controller.AddressController.FindById)
-	router.GET("/api/users/addresses", controller.AddressController.FindAll)
-	router.PUT("/api/users/addresses/:addressId", controller.AddressController.Update)
-	router.DELETE("/api/users/addresses/:addressId", controller.AddressController.Delete)
+	router.POST("/api/addresses", controller.AddressController.Create)
+	router.GET("/api/addresses/:addressId", controller.AddressController.FindById)
+	router.GET("/api/addresses", controller.AddressController.FindAll)
+	router.PUT("/api/addresses/:addressId", controller.AddressController.Update)
+	router.DELETE("/api/addresses/:addressId", controller.AddressController.Delete)
 
 	//USERS OR AUTH
-	router.POST("/api/users/register", controller.AuthController.Register)
-	router.POST("/api/users/login", controller.AuthController.Login)
-	router.POST("/api/users/logout", controller.AuthController.Logout)
-	// router.PUT("/api/users/profile/:userId", controller.AuthController.Logout) //FOR ADMIN
-	// router.POST("/api/users/profile/image", controller.AuthController.Logout) //UPLOAD IMAGE
-	// router.POST("/api/users/profile/image", controller.AuthController.Logout) //GET ALL USERS
-	router.GET("/api/users/profile", controller.AuthController.Profile)
+	router.POST("/api/register", controller.AuthController.Register)
+	router.POST("/api/login", controller.AuthController.Login)
+	router.POST("/api/logout", controller.AuthController.Logout)
+	router.POST("/api/profiles/image", controller.AuthController.CreateImg) //UPLOAD IMAGE
+	router.PUT("/api/profiles/:userId", controller.AuthController.UpdateProfile)
+	router.GET("/api/profiles/:userId", controller.AuthController.Profile) //FOR ADMIN
+	router.GET("/api/profiles", controller.AuthController.FindAll)         //GET ALL USERS
+	router.GET("/api/myprofile", controller.AuthController.MyProfile)
 
 	//CATEGORIES
 	router.POST("/api/categories", controller.CategoryController.Create)
@@ -67,11 +68,11 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.DELETE("/api/carts", controller.ShoppingCartController.DeleteCart)
 
 	//STATUSORDERS
-	router.POST("/api/statusOrder", controller.StatusOrderController.Create)
-	router.PUT("/api/statusOrder/:statusId", controller.StatusOrderController.Update)
+	router.POST("/api/status-order", controller.StatusOrderController.Create)
+	router.PUT("/api/status-order/:statusId", controller.StatusOrderController.Update)
 	// router.DELETE("/api/statusOrder/:statusId", controller.StatusOrderController.Delete) //NOT RECOMENDED
-	router.GET("/api/statusOrder/:statusId", controller.StatusOrderController.FindById)
-	router.GET("/api/statusOrder", controller.StatusOrderController.FindAll)
+	router.GET("/api/status-order/:statusId", controller.StatusOrderController.FindById)
+	router.GET("/api/status-order", controller.StatusOrderController.FindAll)
 
 	//ROLE
 	router.POST("/api/roles", controller.RoleController.Create)
