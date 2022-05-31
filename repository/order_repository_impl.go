@@ -83,12 +83,15 @@ func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
 }
 
 func (repository OrderRepositoryImpl) UpdateTotal(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
-	SQL := `UPDATE orders
-	INNER JOIN orders_detail ON (orders.id = orders_detail.order_id)
-	SET orders.total = (select sum(total_price) from orders_detail where order_id = (select max(orders.id) where orders.user_id = ?))
-	WHERE orders_detail.order_id = (select max(orders.id) where orders.user_id = ?)`
+	// SQL := `UPDATE orders
+	// INNER JOIN orders_detail ON (orders.id = orders_detail.order_id)
+	// SET orders.total = (select sum(total_price) from orders_detail where order_id = (select max(orders.id) where orders.user_id = ?))
+	// WHERE orders_detail.order_id = (select max(orders.id) where orders.user_id = ?)`
 
-	_, err := tx.ExecContext(ctx, SQL, order.User.Id, order.User.Id)
+	SQL := `update orders set total = (select sum(total_price) from orders_detail where order_id = ?)
+	where id = ? and user_id = ?`
+
+	_, err := tx.ExecContext(ctx, SQL, order.Id, order.Id, order.User.Id)
 	helper.PanicIfError(err)
 
 	return order
