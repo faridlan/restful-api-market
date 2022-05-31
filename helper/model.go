@@ -147,7 +147,9 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 			Username: order.User.Username,
 		},
 		Address: web.AddressReponse{
-			// User:            web.UserResponse{},
+			User: web.UserResponse{
+				Id: order.User.Id,
+			},
 			Id:              order.Address.Id,
 			Name:            order.Address.Name,
 			HandphoneNumber: order.Address.HandphoneNumber,

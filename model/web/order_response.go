@@ -21,7 +21,8 @@ type OrderResponse struct {
 	Total     int                 `json:"total,omitempty"`
 	OrderDate time.Time           `json:"order_date,omitempty"`
 	Status    StatusOrderResponse `json:"status_id,omitempty"`
-	Payment   *model.NullString   `json:"payment,omitempty"`
+	Payment   *model.NullString   `json:"payment"`
+	// Payment string `json:"payment,omitempty"`
 }
 
 type OrderResponseCreate struct {

@@ -1,14 +1,20 @@
 package helper
 
-// func NewNullString(s string) *model.NullString {
-// 	if len(s) == 0 {
-// 		return &model.NullString{}
-// 	}
+import (
+	"database/sql"
 
-// 	return &model.NullString{
-// 		NullString: sql.NullString{
-// 			String: s,
-// 			Valid:  true,
-// 		},
-// 	}
-// }
+	"github.com/faridlan/restful-api-market/model"
+)
+
+func NewNullString(s string) *model.NullString {
+	if len(s) == 0 {
+		return &model.NullString{}
+	}
+
+	return &model.NullString{
+		NullString: sql.NullString{
+			String: s,
+			Valid:  true,
+		},
+	}
+}

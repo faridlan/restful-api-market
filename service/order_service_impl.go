@@ -152,15 +152,15 @@ func (service ShippingAddressServiceImpl) UpdatePayment(ctx context.Context, req
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	// stringX := helper.NewNullString(request.Payment)
+	stringX := helper.NewNullString(request.Payment)
 
 	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
 	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-	order, err := service.OrderRepo.FindById(ctx, tx, request.OrderId, request.UserId)
-	helper.PanicIfError(err)
+	order := domain.Order{}
 
 	order.Status.Id = request.StatusId
-	// order.Payment = stringX
+	order.Payment = stringX
+	// order.Payment = request.Payment
 	order.Id = request.OrderId
 	order.User.Id = request.UserId
 
