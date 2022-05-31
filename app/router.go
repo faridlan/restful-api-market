@@ -30,8 +30,9 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/users/register", controller.AuthController.Register)
 	router.POST("/api/users/login", controller.AuthController.Login)
 	router.POST("/api/users/logout", controller.AuthController.Logout)
-	// router.PUT("/api/users/profile/:userId", controller.AuthController.Logout)
-	// router.POST("/api/users/profile/image", controller.AuthController.Logout)
+	// router.PUT("/api/users/profile/:userId", controller.AuthController.Logout) //FOR ADMIN
+	// router.POST("/api/users/profile/image", controller.AuthController.Logout) //UPLOAD IMAGE
+	// router.POST("/api/users/profile/image", controller.AuthController.Logout) //GET ALL USERS
 	router.GET("/api/users/profile", controller.AuthController.Profile)
 
 	//CATEGORIES
@@ -60,10 +61,9 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	//CARTS
 	router.POST("/api/carts", controller.ShoppingCartController.AddToCart)
 	router.GET("/api/carts", controller.ShoppingCartController.FindCart)
-	// router.GET("/api/carts", controller.ShoppingCartController.FindCart) //FINDALL CART //UNFINISH
+	// router.GET("/api/carts", controller.ShoppingCartController.FindCart) //FINDSOME CART //UNFINISH
 	router.PUT("/api/carts/:productId", controller.ShoppingCartController.UpdateQty)
 	router.DELETE("/api/carts", controller.ShoppingCartController.DeleteCart)
-	// router.DELETE("/api/carts/:productId", controller.ShoppingCartController.DeleteCart) //DELETE PER ID //UNFINISH
 
 	//STATUSORDERS
 	router.POST("/api/statusOrder", controller.StatusOrderController.Create)
@@ -72,7 +72,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/statusOrder/:statusId", controller.StatusOrderController.FindById)
 	router.GET("/api/statusOrder", controller.StatusOrderController.FindAll)
 
-	//PAYMENT
+	//ROLE
 
 	// router.PanicHandler = exception.ExceptionError
 
