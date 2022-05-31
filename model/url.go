@@ -40,7 +40,7 @@ func Endpoints() []Endpoint {
 			Method: "POST",
 		},
 		{
-			Url:    "/api/statusOrder/statusId",
+			Url:    "/api/statusOrder/:statusId",
 			Method: "PUT",
 		},
 		{
@@ -48,7 +48,19 @@ func Endpoints() []Endpoint {
 			Method: "GET",
 		},
 		{
-			Url:    "/api/statusOrder/statudId",
+			Url:    "/api/statusOrder/:statudId",
+			Method: "GET",
+		},
+		{
+			Url:    "/api/roles",
+			Method: "POST",
+		},
+		{
+			Url:    "/api/roles/:roleId",
+			Method: "PUT",
+		},
+		{
+			Url:    "/api/roles",
 			Method: "GET",
 		},
 	}

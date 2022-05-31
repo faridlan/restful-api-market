@@ -13,6 +13,7 @@ type ControllerRouter struct {
 	ShippingAddressController controller.ShippingAddressController
 	ShoppingCartController    controller.ShoppingCartController
 	StatusOrderController     controller.StatusOrderController
+	RoleController            controller.RoleController
 }
 
 func NewRouter(controller ControllerRouter) *httprouter.Router {
@@ -73,6 +74,9 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/statusOrder", controller.StatusOrderController.FindAll)
 
 	//ROLE
+	router.POST("/api/roles", controller.RoleController.Create)
+	router.PUT("/api/roles/:roleId", controller.RoleController.Update)
+	router.GET("/api/roles", controller.RoleController.FindAll)
 
 	// router.PanicHandler = exception.ExceptionError
 

@@ -289,3 +289,19 @@ func ToStatusOrderResponses(statusOrders []domain.StatusOrder) []web.StatusOrder
 	return statusOrderResponses
 
 }
+
+func ToRoleResponse(role domain.Role) web.RoleResponse {
+	return web.RoleResponse{
+		Id:   role.Id,
+		Name: role.Name,
+	}
+}
+
+func ToRoleResponses(roles []domain.Role) []web.RoleResponse {
+	roleResponses := []web.RoleResponse{}
+	for _, role := range roles {
+		roleResponses = append(roleResponses, ToRoleResponse(role))
+	}
+
+	return roleResponses
+}
