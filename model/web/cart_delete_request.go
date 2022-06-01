@@ -8,3 +8,11 @@ type CartDeleteRequest struct {
 type CartsDeleteRequest struct {
 	Detail []CartDeleteRequest `json:"detail,omitempty"`
 }
+
+type CartSelectRequest struct {
+	CartId int `json:"cart_id,omitempty" validate:"required"`
+}
+
+type CartsSelectRequest struct {
+	Detail []CartSelectRequest `json:"detail,omitempty"`
+}

@@ -11,4 +11,5 @@ type ShoppingCartService interface {
 	FindCart(ctx context.Context, userId int) []web.CartResponse
 	UpdateQty(ctx context.Context, request web.CartUpdateRequest) web.CartResponse
 	DeleteCart(ctx context.Context, request []web.CartDeleteRequest)
+	FindSomeCart(ctx context.Context, request []web.CartSelectRequest) []web.CartResponse
 }

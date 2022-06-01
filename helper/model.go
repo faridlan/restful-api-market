@@ -305,3 +305,18 @@ func ToRoleResponses(roles []domain.Role) []web.RoleResponse {
 
 	return roleResponses
 }
+
+func ToSelectCartRequest(cart web.CartSelectRequest) domain.Cart {
+	return domain.Cart{
+		Id: cart.CartId,
+	}
+}
+
+func ToSelectCartsRequest(carts []web.CartSelectRequest) []domain.Cart {
+	cartsRequest := []domain.Cart{}
+	for _, c := range carts {
+		cartsRequest = append(cartsRequest, ToSelectCartRequest(c))
+	}
+
+	return cartsRequest
+}

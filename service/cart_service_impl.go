@@ -94,3 +94,17 @@ func (service ShoppingCartServiceImpl) DeleteCart(ctx context.Context, request [
 	carts := helper.ToCartsDelete(request)
 	service.CartRepository.Delete(ctx, tx, carts)
 }
+
+func (service ShoppingCartServiceImpl) FindSomeCart(ctx context.Context, request []web.CartSelectRequest) []web.CartResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+
+	defer helper.CommitOrRollbak(tx)
+
+	carts := helper.ToSelectCartsRequest(request)
+
+	cartResponses := service.CartRepository.FindSome(ctx, tx, carts)
+	helper.PanicIfError(err)
+
+	return helper.ToCartResponses(cartResponses)
+}

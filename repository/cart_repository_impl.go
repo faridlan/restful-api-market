@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
@@ -95,4 +96,32 @@ func (repository CartRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, us
 	}
 
 	return carts, nil
+}
+
+func (repository CartRepositoryImpl) FindSome(ctx context.Context, tx *sql.Tx, cartId []domain.Cart) []domain.Cart {
+	SQL := `select c.id, u.id, u.username, c.quantity, p.id, p.product_name, ct.category_name, p.price, p.quantity, p.image_url from carts as c
+	left join products as p on p.id = c.product_id
+	left join categories as ct on ct.id = p.category_id
+	left join users as u on u.id = c.user_id
+	where c.id in(?`
+	SQL += strings.Repeat(",?", len(cartId)-1) + ")"
+	var val []interface{}
+	for _, c := range cartId {
+		val = append(val, c.Id)
+	}
+
+	stmt, err := tx.PrepareContext(ctx, SQL)
+	helper.PanicIfError(err)
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, val...)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+	}
+
+	return cartId
 }

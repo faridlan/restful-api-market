@@ -105,3 +105,18 @@ func (controller *ShoppingCartControllerImpl) DeleteCart(writer http.ResponseWri
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *ShoppingCartControllerImpl) FindSome(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	cartRequest := web.CartsSelectRequest{}
+	helper.ReadFromRequestBody(request, &cartRequest)
+
+	cartResponse := controller.Service.FindSomeCart(request.Context(), cartRequest.Detail)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   cartResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
+}

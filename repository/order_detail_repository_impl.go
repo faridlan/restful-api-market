@@ -26,7 +26,7 @@ func (repository OrderDetailRepositoryImpl) Save(ctx context.Context, tx *sql.Tx
 
 	SqlScript = SqlScript[0 : len(SqlScript)-1]
 
-	Statement, err := tx.PrepareContext(context.Background(), SqlScript)
+	Statement, err := tx.PrepareContext(ctx, SqlScript)
 	if err != nil {
 		panic(err)
 	}
