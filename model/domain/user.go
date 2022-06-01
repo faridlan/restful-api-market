@@ -8,5 +8,5 @@ type User struct {
 	Email    string
 	Password string
 	ImageUrl *model.NullString
-	RoleId   int
+	Role     Role
 }

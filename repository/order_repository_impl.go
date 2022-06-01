@@ -31,7 +31,7 @@ func (repository OrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, orde
 func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, orderId int, userId int) (domain.Order, error) {
 	SQL := `select o.id, u.username,
 	a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
-	o.total, o.order_date, s.status_name, o.payment from orders as o
+	o.total, o.order_date, s.id, s.status_name, o.payment from orders as o
 	inner join users as u on u.id = o.user_id
 	inner join addresses as a on a.id = o.address_id
 	inner join status_order as s on s.id = o.status_id
@@ -44,7 +44,7 @@ func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 
 	order := domain.Order{}
 	if rows.Next() {
-		err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate, &order.Status.StatusName, &order.Payment)
+		err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate, &order.Status.Id, &order.Status.StatusName, &order.Payment)
 		helper.PanicIfError(err)
 
 		return order, nil
@@ -54,11 +54,10 @@ func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Order, error) {
-	SQL := `select o.id, u.username, 
-	a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
-	o.total, o.order_date from orders as o
+	SQL := `select o.id, u.username,
+	o.total, o.order_date, s.id, s.status_name, o.payment from orders as o
 	inner join users as u on u.id = o.user_id
-	inner join addresses as a on a.id = o.address_id
+	inner join status_order as s on s.id = o.status_id
 	where o.user_id = ?`
 
 	rows, err := tx.QueryContext(ctx, SQL, userId)
@@ -71,7 +70,7 @@ func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
 	if rows.Next() {
 		for rows.Next() {
 			order := domain.Order{}
-			err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate)
+			err := rows.Scan(&order.Id, &order.User.Username, &order.Total, &order.OrderDate, &order.Status.Id, &order.Status.StatusName, &order.Payment)
 			helper.PanicIfError(err)
 
 			orders = append(orders, order)
@@ -83,11 +82,6 @@ func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
 }
 
 func (repository OrderRepositoryImpl) UpdateTotal(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
-	// SQL := `UPDATE orders
-	// INNER JOIN orders_detail ON (orders.id = orders_detail.order_id)
-	// SET orders.total = (select sum(total_price) from orders_detail where order_id = (select max(orders.id) where orders.user_id = ?))
-	// WHERE orders_detail.order_id = (select max(orders.id) where orders.user_id = ?)`
-
 	SQL := `update orders set total = (select sum(total_price) from orders_detail where order_id = ?)
 	where id = ? and user_id = ?`
 
@@ -114,11 +108,10 @@ func (repository OrderRepositoryImpl) UpdatePayment(ctx context.Context, tx *sql
 }
 
 func (repository OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Order {
-	SQL := `select o.id, u.username, 
-	a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment,
-	o.total, o.order_date from orders as o
+	SQL := `select o.id, u.username,
+	o.total, o.order_date, s.id, s.status_name, o.payment from orders as o
 	inner join users as u on u.id = o.user_id
-	inner join addresses as a on a.id = o.address_id`
+	inner join status_order as s on s.id = o.status_id`
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
@@ -129,7 +122,7 @@ func (repository OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 
 	for rows.Next() {
 		order := domain.Order{}
-		err := rows.Scan(&order.Id, &order.User.Username, &order.Address.Name, &order.Address.HandphoneNumber, &order.Address.Street, &order.Address.Districk, &order.Address.PostCode, &order.Address.Comment, &order.Total, &order.OrderDate)
+		err := rows.Scan(&order.Id, &order.User.Username, &order.Total, &order.OrderDate, &order.Status.Id, &order.Status.StatusName, &order.Payment)
 		helper.PanicIfError(err)
 
 		orders = append(orders, order)

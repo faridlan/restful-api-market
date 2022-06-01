@@ -45,7 +45,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/categories", controller.CategoryController.FindAll)
 
 	//PRODUCTS
-	router.GET("/api/products", controller.ProductController.FindById)
+	router.GET("/api/products", controller.ProductController.FindAll)
 	router.POST("/api/products", controller.ProductController.Create)
 	router.POST("/api/products/image", controller.ProductController.CreateImg)
 	router.PUT("/api/products/:productId", controller.ProductController.Update)
@@ -57,8 +57,8 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
 	router.PUT("/api/status/order", controller.ShippingAddressController.UpdateStatus)
 	router.PUT("/api/payment/order", controller.ShippingAddressController.UpdatePayment)
-	router.GET("/api/orders/user/:orderId", controller.ShippingAddressController.FindOrderById)
-	router.GET("/api/orders/user", controller.ShippingAddressController.FindAllOrder)
+	router.GET("/api/user/orders/:orderId", controller.ShippingAddressController.FindOrderById)
+	router.GET("/api/user/orders", controller.ShippingAddressController.FindAllOrder)
 	router.GET("/api/order/:id", controller.ShippingAddressController.FindById)
 	router.GET("/api/orders", controller.ShippingAddressController.FindAll)
 

@@ -46,7 +46,9 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 		Email:    request.Email,
 		Password: request.Password,
 		ImageUrl: stringImg,
-		RoleId:   request.RoleId,
+		Role: domain.Role{
+			Id: request.RoleId,
+		},
 	}
 
 	user = service.UserRepository.Save(ctx, tx, user)
@@ -77,7 +79,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 		Id:       user.Id,
 		Username: user.Username,
 		Email:    user.Email,
-		RoleId:   user.RoleId,
+		RoleId:   user.Role.Id,
 		Token:    random,
 		RegisteredClaims: &jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(web.ExpiredTime),

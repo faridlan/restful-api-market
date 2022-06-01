@@ -11,7 +11,10 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		Username: user.Username,
 		Email:    user.Email,
 		ImageUrl: user.ImageUrl,
-		RoleId:   user.RoleId,
+		Role: &web.RoleResponse{
+			Id:   user.Role.Id,
+			Name: user.Role.Name,
+		},
 	}
 }
 
@@ -99,7 +102,7 @@ func ToCartResponses(carts []domain.Cart) []web.CartResponse {
 func ToAddressResponse(address domain.Address) web.AddressReponse {
 	return web.AddressReponse{
 		Id: address.Id,
-		User: web.UserResponse{
+		User: &web.UserResponse{
 			Id:       address.User.Id,
 			Username: address.User.Username,
 		},
@@ -142,14 +145,11 @@ func ToOrderDetailResponses(orders []domain.OrderDetail) []web.OrdersDetail {
 func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderResponse {
 	return web.OrderResponse{
 		OrderId: order.Id,
-		User: web.UserResponse{
+		User: &web.UserResponse{
 			Id:       order.User.Id,
 			Username: order.User.Username,
 		},
-		Address: web.AddressReponse{
-			User: web.UserResponse{
-				Id: order.User.Id,
-			},
+		Address: &web.AddressReponse{
 			Id:              order.Address.Id,
 			Name:            order.Address.Name,
 			HandphoneNumber: order.Address.HandphoneNumber,
@@ -172,7 +172,7 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 func ToOrdersResponse(order domain.Order) web.OrderResponse {
 	return web.OrderResponse{
 		OrderId: order.Id,
-		User: web.UserResponse{
+		User: &web.UserResponse{
 			Id:       order.User.Id,
 			Username: order.User.Username,
 		},
@@ -182,7 +182,7 @@ func ToOrdersResponse(order domain.Order) web.OrderResponse {
 			Id:         order.Status.Id,
 			StatusName: order.Status.StatusName,
 		},
-		// Payment:   web.PaymentResponse{},
+		Payment: order.Payment,
 	}
 }
 

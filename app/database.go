@@ -13,7 +13,8 @@ func NewDB() *sql.DB {
 	// port := os.Getenv("PORT")
 	// host := os.Getenv("HOST")
 
-	db, err := sql.Open("mysql", "doadmin:AVNS_8TEum2I8sYujL-B@tcp(db-mysql-sgp1-26481-do-user-11599617-0.b.db.ondigitalocean.com:25060)/e_market?parseTime=true")
+	// db, err := sql.Open("mysql", "doadmin:AVNS_8TEum2I8sYujL-B@tcp(db-mysql-sgp1-26481-do-user-11599617-0.b.db.ondigitalocean.com:25060)/e_market?parseTime=true")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/e_market?parseTime=true")
 	// db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/e_market?parseTime=true", user, pass, host, port))
 	helper.PanicIfError(err)
 

@@ -39,7 +39,7 @@ func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user
 	user = domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.RoleId)
+		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.Role.Id)
 		// err := rows.Scan(&user.Id, &user.Username, &user.Email)
 		helper.PanicIfError(err)
 		return user, nil
@@ -49,8 +49,9 @@ func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user
 }
 
 func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	SQL := "select id,username,email,image_url,role_id from users where id = ?"
-	// SQL := "select id,username,email from users where id = ?"
+	SQL := `select u.id,u.username,u.email,u.image_url,r.id, r.role_name from users as u 
+	inner join roles as r on u.role_id = r.id 
+	where u.id = ?`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	helper.PanicIfError(err)
 
@@ -58,8 +59,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 	user := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.RoleId)
-		// err := rows.Scan(&user.Id, &user.Username, &user.Email)
+		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.Name)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {
@@ -68,7 +68,8 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 }
 
 func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := "select id,username,email,image_url, role_id from users"
+	SQL := `select u.id,u.username,u.email,u.image_url,r.id, r.role_name from users as u 
+	inner join roles as r on u.role_id = r.id`
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 
@@ -77,8 +78,7 @@ func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []
 
 	for rows.Next() {
 		user := domain.User{}
-		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.RoleId)
-		// err := rows.Scan(&user.Id, &user.Username, &user.Email)
+		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.Name)
 		helper.PanicIfError(err)
 
 		users = append(users, user)
