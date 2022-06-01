@@ -13,4 +13,6 @@ type ShippingAddressService interface {
 	UpdateStatus(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse
 	UpdatePayment(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse
 	UploadImage(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponseImg
+	FindAll(ctx context.Context) []web.OrderResponse
+	FindById(ctx context.Context, orderId int) web.OrderResponse
 }

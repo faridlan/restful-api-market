@@ -186,8 +186,29 @@ func (service ShippingAddressServiceImpl) UploadImage(ctx context.Context, reque
 	helper.PanicIfError(err)
 
 	image := web.OrderResponseImg{
-		Image: "https://" + endpoint + *object.Key,
+		Image: "https://" + *object.Bucket + "." + endpoint + *object.Key,
 	}
 
 	return image
+}
+
+func (service ShippingAddressServiceImpl) FindAll(ctx context.Context) []web.OrderResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	orders := service.OrderRepo.FindAll(ctx, tx)
+
+	return helper.ToOrdersResponses(orders)
+}
+
+func (service ShippingAddressServiceImpl) FindById(ctx context.Context, orderId int) web.OrderResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	order, err := service.OrderRepo.FindId(ctx, tx, orderId)
+	helper.PanicIfError(err)
+
+	return helper.ToOrdersResponse(order)
 }

@@ -142,3 +142,31 @@ func (controller *ShippingAddressControllerImpl) CreateImg(writer http.ResponseW
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *ShippingAddressControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	orderResponses := controller.ShippingAddressService.FindAll(request.Context())
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   orderResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ShippingAddressControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	orderId := params.ByName("id")
+	id, err := strconv.Atoi(orderId)
+	helper.PanicIfError(err)
+
+	orderResponse := controller.ShippingAddressService.FindById(request.Context(), id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   orderResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

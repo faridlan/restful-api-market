@@ -14,4 +14,6 @@ type OrderRepository interface {
 	UpdateTotal(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
 	UpdateStatus(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
 	UpdatePayment(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
+	FindAll(ctx context.Context, tx *sql.Tx) []domain.Order
+	FindId(ctx context.Context, tx *sql.Tx, orderId int) (domain.Order, error)
 }

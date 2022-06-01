@@ -54,11 +54,13 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 
 	//ORDERS
 	router.POST("/api/orders", controller.ShippingAddressController.CreateOrder)
-	router.GET("/api/orders/:orderId", controller.ShippingAddressController.FindOrderById)
-	router.GET("/api/orders", controller.ShippingAddressController.FindAllOrder)
+	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
 	router.PUT("/api/status/order", controller.ShippingAddressController.UpdateStatus)
 	router.PUT("/api/payment/order", controller.ShippingAddressController.UpdatePayment)
-	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
+	router.GET("/api/orders/user/:orderId", controller.ShippingAddressController.FindOrderById)
+	router.GET("/api/orders/user", controller.ShippingAddressController.FindAllOrder)
+	router.GET("/api/order/:id", controller.ShippingAddressController.FindById)
+	router.GET("/api/orders", controller.ShippingAddressController.FindAll)
 
 	//CARTS
 	router.POST("/api/carts", controller.ShoppingCartController.AddToCart)

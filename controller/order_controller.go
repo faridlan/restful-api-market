@@ -13,4 +13,6 @@ type ShippingAddressController interface {
 	UpdateStatus(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	UpdatePayment(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	CreateImg(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }
