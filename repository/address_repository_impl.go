@@ -62,7 +62,7 @@ func (repository AddressRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx
 	}
 }
 
-func (repository AddressRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, userId int) []domain.Address {
+func (repository AddressRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Address, error) {
 	SQL := `select a.id, u.id, u.username, a.name, a.handphone_number, a.street, a.districk, a.post_code, a.comment from addresses as a
 	left join users as u on u.id = a.user_id
 	where a.user_id = ?`
@@ -75,11 +75,14 @@ func (repository AddressRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx,
 
 	for rows.Next() {
 		address := domain.Address{}
-		err := rows.Scan(&address.Id, &address.User.Id, &address.User.Username, &address.Name, &address.HandphoneNumber, &address.Street, &address.Districk, &address.PostCode, &address.Comment)
-		helper.PanicIfError(err)
-
+		err = rows.Scan(&address.Id, &address.User.Id, &address.User.Username, &address.Name, &address.HandphoneNumber, &address.Street, &address.Districk, &address.PostCode, &address.Comment)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return addresses, errors.New("address not found")
+			}
+		}
 		addresses = append(addresses, address)
 	}
 
-	return addresses
+	return addresses, nil
 }

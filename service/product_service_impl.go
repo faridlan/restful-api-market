@@ -115,7 +115,7 @@ func (servicer ProductServiceImpl) CreateImg(ctx context.Context, request web.Pr
 	helper.PanicIfError(err)
 
 	image := web.ProductResponse{
-		ImageUrl: "https://" + endpoint + *object.Key,
+		ImageUrl: "https://" + *object.Bucket + "." + endpoint + *object.Key,
 	}
 
 	return image

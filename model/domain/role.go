@@ -1,6 +1,7 @@
 package domain
 
 type Role struct {
-	Id   int
-	Name string
+	Id     int
+	IdRole string
+	Name   string
 }

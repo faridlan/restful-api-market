@@ -102,7 +102,8 @@ func (service AddressServiceImpl) FindAll(ctx context.Context, userId int) []web
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	addresses := service.AddressRepo.FindAll(ctx, tx, userId)
+	addresses, err := service.AddressRepo.FindAll(ctx, tx, userId)
+	helper.PanicIfError(err)
 
 	return helper.ToAddressResponses(addresses)
 }

@@ -8,6 +8,7 @@ import (
 
 type Order struct {
 	Id        int
+	IdOrder   string
 	User      User
 	Address   Address
 	Total     int

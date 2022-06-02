@@ -15,6 +15,7 @@ type OrdersDetail struct {
 
 type OrderResponse struct {
 	OrderId   int                 `json:"order_id,omitempty"`
+	IdOrder   string              `json:"id_order,omitempty"`
 	User      *UserResponse       `json:"user,omitempty"`
 	Address   *AddressReponse     `json:"address,omitempty"`
 	Detail    []OrdersDetail      `json:"detail,omitempty"`

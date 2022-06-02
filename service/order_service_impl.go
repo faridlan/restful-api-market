@@ -53,55 +53,28 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 
 	orders := helper.ToCreateOrders(request.Detail)
 
-	if request.Detail[0].CartId == 0 {
-		//Create Order
+	//Create Order
 
-		createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
+	createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
 
-		//Create Order Detail
-		service.OrderDetailRepo.Save(ctx, tx, orders)
-		//Update Total Price in Order Detail
-		service.OrderDetailRepo.UpdateTotal(ctx, tx, orders)
-		//Update Product Quantity
-		service.OrderDetailRepo.UpdateProductQty(ctx, tx, orders)
-		//Update Total in Order
-		createOrder = service.OrderRepo.UpdateTotal(ctx, tx, createOrder)
+	//Create Order Detail
+	service.OrderDetailRepo.Save(ctx, tx, orders)
+	//Update Total Price in Order Detail
+	service.OrderDetailRepo.UpdateTotal(ctx, tx, orders)
+	//Update Product Quantity
+	service.OrderDetailRepo.UpdateProductQty(ctx, tx, orders)
+	//Update Total in Order
+	createOrder = service.OrderRepo.UpdateTotal(ctx, tx, createOrder)
 
-		//Make Response Order
-		orderDetail := service.OrderDetailRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
-		ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-		orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
-		helper.PanicIfError(err)
+	//Make Response Order
+	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
+	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
+	orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
+	helper.PanicIfError(err)
 
-		//Delete Cart
+	//Delete Cart
 
-		return helper.ToOrderResponse(orderResponse, ordersDetail)
-	} else {
-		//Create Order
-
-		createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
-
-		//Create Order Detail
-		service.OrderDetailRepo.Save(ctx, tx, orders)
-		//Update Total Price in Order Detail
-		service.OrderDetailRepo.UpdateTotal(ctx, tx, orders)
-		//Update Product Quantity
-		service.OrderDetailRepo.UpdateProductQty(ctx, tx, orders)
-		//Update Total in Order
-		createOrder = service.OrderRepo.UpdateTotal(ctx, tx, createOrder)
-
-		//Make Response Order
-		orderDetail := service.OrderDetailRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
-		ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-		orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
-		helper.PanicIfError(err)
-
-		//Delete Cart
-		carts := helper.ToDeleteOrderCarts(request.Detail)
-		service.CartRepo.Delete(ctx, tx, carts)
-
-		return helper.ToOrderResponse(orderResponse, ordersDetail)
-	}
+	return helper.ToOrderResponse(orderResponse, ordersDetail)
 
 }
 

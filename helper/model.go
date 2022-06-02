@@ -12,8 +12,9 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		Email:    user.Email,
 		ImageUrl: user.ImageUrl,
 		Role: &web.RoleResponse{
-			Id:   user.Role.Id,
-			Name: user.Role.Name,
+			Id:     user.Role.Id,
+			IdRole: user.Role.IdRole,
+			Name:   user.Role.Name,
 		},
 	}
 }
@@ -48,9 +49,11 @@ func ToBlacklistResponse(blaclist domain.Blacklist) web.BlacklistResponse {
 func ToProductResponse(product domain.Product) web.ProductResponse {
 	return web.ProductResponse{
 		Id:          product.Id,
+		IdProduct:   product.IdProduct,
 		ProductName: product.ProductName,
-		Category: web.CategoryResponse{
+		Category: &web.CategoryResponse{
 			Id:           product.Category.Id,
+			IdCategory:   product.Category.IdCategory,
 			CategoryName: product.Category.CategoryName,
 		},
 		Price:    product.Price,
@@ -78,7 +81,7 @@ func ToCartResponse(cart domain.Cart) web.CartResponse {
 		Product: web.ProductResponse{
 			Id:          cart.Product.Id,
 			ProductName: cart.Product.ProductName,
-			Category: web.CategoryResponse{
+			Category: &web.CategoryResponse{
 				Id:           cart.Product.Category.Id,
 				CategoryName: cart.Product.Category.CategoryName,
 			},
@@ -145,6 +148,7 @@ func ToOrderDetailResponses(orders []domain.OrderDetail) []web.OrdersDetail {
 func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderResponse {
 	return web.OrderResponse{
 		OrderId: order.Id,
+		IdOrder: order.IdOrder,
 		User: &web.UserResponse{
 			Id:       order.User.Id,
 			Username: order.User.Username,
@@ -172,6 +176,7 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 func ToOrdersResponse(order domain.Order) web.OrderResponse {
 	return web.OrderResponse{
 		OrderId: order.Id,
+		IdOrder: order.IdOrder,
 		User: &web.UserResponse{
 			Id:       order.User.Id,
 			Username: order.User.Username,
@@ -261,6 +266,7 @@ func ToDeleteOrderCarts(carts []web.CreateOrder) []domain.Cart {
 func ToCategoryResponse(category domain.Category) web.CategoryResponse {
 	return web.CategoryResponse{
 		Id:           category.Id,
+		IdCategory:   category.IdCategory,
 		CategoryName: category.CategoryName,
 	}
 }
@@ -292,8 +298,9 @@ func ToStatusOrderResponses(statusOrders []domain.StatusOrder) []web.StatusOrder
 
 func ToRoleResponse(role domain.Role) web.RoleResponse {
 	return web.RoleResponse{
-		Id:   role.Id,
-		Name: role.Name,
+		Id:     role.Id,
+		IdRole: role.IdRole,
+		Name:   role.Name,
 	}
 }
 

@@ -1,8 +1,8 @@
 package web
 
 type CreateOrder struct {
-	UserId    int `json:"user_id,"`
-	CartId    int `json:"cart_id," validate:"required,min=0"`
+	UserId int `json:"user_id,"`
+	// CartId    int `json:"cart_id," validate:"required,min=0"`
 	ProductId int `json:"product_id," validate:"required,min=0"`
 	Quantity  int `json:"quantity," validate:"required,min=0"`
 }

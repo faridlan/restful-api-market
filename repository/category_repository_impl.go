@@ -18,7 +18,7 @@ func NewCategoryRepository() CategoryRepository {
 
 func (repository CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
 
-	SQL := "insert into categories(category_name) values (?)"
+	SQL := "insert into categories(id_category,category_name) values (REPLACE(UUID(),'-',''),?)"
 	result, err := tx.ExecContext(ctx, SQL, category.CategoryName)
 	helper.PanicIfError(err)
 
@@ -48,7 +48,7 @@ func (repository CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx,
 }
 
 func (repository CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error) {
-	SQL := "select id, category_name from categories where id = ?"
+	SQL := "select id, id_category, category_name from categories where id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, categoryId)
 	helper.PanicIfError(err)
 
@@ -57,7 +57,7 @@ func (repository CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	category := domain.Category{}
 
 	if rows.Next() {
-		err := rows.Scan(&category.Id, &category.CategoryName)
+		err := rows.Scan(&category.Id, &category.IdCategory, &category.CategoryName)
 		helper.PanicIfError(err)
 
 		return category, nil
@@ -67,7 +67,7 @@ func (repository CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 }
 
 func (repository CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Category {
-	SQL := "select id, category_name from categories"
+	SQL := "select id, id_category, category_name from categories"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 
@@ -77,7 +77,7 @@ func (repository CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 
 	for rows.Next() {
 		category := domain.Category{}
-		err := rows.Scan(&category.Id, &category.CategoryName)
+		err := rows.Scan(&category.Id, &category.IdCategory, &category.CategoryName)
 		helper.PanicIfError(err)
 
 		categories = append(categories, category)

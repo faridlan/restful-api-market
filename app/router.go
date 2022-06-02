@@ -66,7 +66,6 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/carts", controller.ShoppingCartController.AddToCart)
 	router.GET("/api/carts", controller.ShoppingCartController.FindCart)
 	router.GET("/api/some/carts", controller.ShoppingCartController.FindSome)
-	// router.GET("/api/carts", controller.ShoppingCartController.FindCart) //FINDSOME CART //UNFINISH
 	router.PUT("/api/carts/:productId", controller.ShoppingCartController.UpdateQty)
 	router.DELETE("/api/carts", controller.ShoppingCartController.DeleteCart)
 

@@ -119,9 +119,13 @@ func (repository CartRepositoryImpl) FindSome(ctx context.Context, tx *sql.Tx, c
 
 	defer rows.Close()
 
+	carts := []domain.Cart{}
 	for rows.Next() {
-
+		cart := domain.Cart{}
+		err := rows.Scan(&cart.Id, &cart.User.Id, &cart.User.Username, &cart.Quantity, &cart.Product.Id, &cart.Product.ProductName, &cart.Product.Category.CategoryName, &cart.Product.Price, &cart.Product.Quantity, &cart.Product.ImageUrl)
+		helper.PanicIfError(err)
+		carts = append(carts, cart)
 	}
+	return carts
 
-	return cartId
 }

@@ -17,7 +17,7 @@ func NewRoleRepository() RoleRepository {
 }
 
 func (repository RoleRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, role domain.Role) domain.Role {
-	SQL := "insert into roles(role_name) values (?)"
+	SQL := "insert into roles(id_role, role_name) values (REPLACE(UUID(),'-',''),?)"
 	result, err := tx.ExecContext(ctx, SQL, role.Name)
 	helper.PanicIfError(err)
 
@@ -38,7 +38,7 @@ func (repository RoleRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, rol
 }
 
 func (repository RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, roleId int) (domain.Role, error) {
-	SQL := "select id, role_name from roles where id = ?"
+	SQL := "select id, id_role, role_name from roles where id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, roleId)
 	helper.PanicIfError(err)
 
@@ -47,7 +47,7 @@ func (repository RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, r
 	role := domain.Role{}
 
 	if rows.Next() {
-		err := rows.Scan(&role.Id, &role.Name)
+		err := rows.Scan(&role.Id, &role.IdRole, &role.Name)
 		helper.PanicIfError(err)
 		return role, nil
 	} else {
@@ -57,7 +57,7 @@ func (repository RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, r
 }
 
 func (repository RoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Role {
-	SQL := "select id, role_name from roles"
+	SQL := "select id, id_role, role_name from roles"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 
@@ -67,7 +67,7 @@ func (repository RoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []
 
 	for rows.Next() {
 		role := domain.Role{}
-		err := rows.Scan(&role.Id, &role.Name)
+		err := rows.Scan(&role.Id, &role.IdRole, &role.Name)
 		helper.PanicIfError(err)
 
 		roles = append(roles, role)

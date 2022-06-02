@@ -68,7 +68,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 }
 
 func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := `select u.id,u.username,u.email,u.image_url,r.id, r.role_name from users as u 
+	SQL := `select u.id,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
 	inner join roles as r on u.role_id = r.id`
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
@@ -78,7 +78,7 @@ func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []
 
 	for rows.Next() {
 		user := domain.User{}
-		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.Name)
+		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
 		helper.PanicIfError(err)
 
 		users = append(users, user)

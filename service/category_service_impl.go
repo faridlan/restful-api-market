@@ -38,6 +38,8 @@ func (service CategoryServiceImpl) Create(ctx context.Context, request web.Categ
 	}
 
 	category = service.CategoryRepo.Save(ctx, tx, category)
+	category, err = service.CategoryRepo.FindById(ctx, tx, category.Id)
+	helper.PanicIfError(err)
 
 	return helper.ToCategoryResponse(category)
 }

@@ -38,6 +38,8 @@ func (service RoleServiceImpl) Create(ctx context.Context, request web.RoleCreat
 	}
 
 	role = service.RoleRepository.Save(ctx, tx, role)
+	role, err = service.RoleRepository.FindById(ctx, tx, role.Id)
+	helper.PanicIfError(err)
 
 	return helper.ToRoleResponse(role)
 }
