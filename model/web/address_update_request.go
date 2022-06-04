@@ -2,6 +2,7 @@ package web
 
 type AddressUpdateRequest struct {
 	Id              int    `json:"id,omitempty"`
+	IdAddress       string `json:"id_address,omitempty"`
 	UserId          int    `json:"user_id,omitempty"`
 	Name            string `json:"name,omitempty"`
 	HandphoneNumber string `json:"handphone_number,omitempty"`

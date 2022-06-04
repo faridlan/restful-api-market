@@ -18,14 +18,16 @@ import (
 type AuthServiceImpl struct {
 	UserRepository      repository.UserRepository
 	BlacklistRepository repository.BlacklistRepository
+	Uuid                repository.UuidRepository
 	DB                  *sql.DB
 	Validate            *validator.Validate
 }
 
-func NewAuthService(userRepository repository.UserRepository, blacklistRepository repository.BlacklistRepository, DB *sql.DB, validate *validator.Validate) AuthService {
+func NewAuthService(userRepository repository.UserRepository, blacklistRepository repository.BlacklistRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) AuthService {
 	return AuthServiceImpl{
 		UserRepository:      userRepository,
 		BlacklistRepository: blacklistRepository,
+		Uuid:                Uuid,
 		DB:                  DB,
 		Validate:            validate,
 	}
@@ -41,7 +43,11 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
 	user := domain.User{
+		IdUser:   uuid.Uuid,
 		Username: request.Username,
 		Email:    request.Email,
 		Password: request.Password,
@@ -77,6 +83,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 
 	claim := web.Claims{
 		Id:       user.Id,
+		IdUser:   user.IdUser,
 		Username: user.Username,
 		Email:    user.Email,
 		RoleId:   user.Role.Id,
@@ -89,7 +96,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 	return helper.ToJwtResponse(claim)
 }
 
-func (service AuthServiceImpl) Profile(ctx context.Context, userId int) web.UserResponse {
+func (service AuthServiceImpl) Profile(ctx context.Context, userId string) web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -107,9 +114,10 @@ func (service AuthServiceImpl) UpdateProfile(ctx context.Context, request web.Us
 
 	stringImg := helper.NewNullString(request.ImageUrl)
 
-	user, err := service.UserRepository.FindById(ctx, tx, request.Id)
+	user, err := service.UserRepository.FindById(ctx, tx, request.IdUser)
 	helper.PanicIfError(err)
 
+	user.IdUser = request.IdUser
 	user.Username = request.Username
 	user.Email = request.Email
 	user.ImageUrl = stringImg

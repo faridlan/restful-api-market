@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -39,10 +38,8 @@ func (controller *StatusOrderControllerImpl) Update(writer http.ResponseWriter, 
 	helper.ReadFromRequestBody(request, &statusOrderUpdate)
 
 	statusOrderId := params.ByName("statusId")
-	id, err := strconv.Atoi(statusOrderId)
-	helper.PanicIfError(err)
 
-	statusOrderUpdate.Id = id
+	statusOrderUpdate.IdStatusOrder = statusOrderId
 
 	statusOrderResponse := controller.Service.Update(request.Context(), statusOrderUpdate)
 	webResponse := web.WebResponse{
@@ -56,10 +53,8 @@ func (controller *StatusOrderControllerImpl) Update(writer http.ResponseWriter, 
 
 func (controller *StatusOrderControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	statusOrderId := params.ByName("statusId")
-	id, err := strconv.Atoi(statusOrderId)
-	helper.PanicIfError(err)
 
-	controller.Service.Delete(request.Context(), id)
+	controller.Service.Delete(request.Context(), statusOrderId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -70,10 +65,8 @@ func (controller *StatusOrderControllerImpl) Delete(writer http.ResponseWriter, 
 
 func (controller *StatusOrderControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	statusOrderId := params.ByName("statusId")
-	id, err := strconv.Atoi(statusOrderId)
-	helper.PanicIfError(err)
 
-	statudOrderResponse := controller.Service.FindById(request.Context(), id)
+	statudOrderResponse := controller.Service.FindById(request.Context(), statusOrderId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

@@ -11,6 +11,6 @@ type AddressRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address
 	Update(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address
 	Delete(ctx context.Context, tx *sql.Tx, address domain.Address)
-	FindById(ctx context.Context, tx *sql.Tx, addressId int, userId int) (domain.Address, error)
+	FindById(ctx context.Context, tx *sql.Tx, addressId string, userId int) (domain.Address, error)
 	FindAll(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Address, error)
 }

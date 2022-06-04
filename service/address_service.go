@@ -9,7 +9,7 @@ import (
 type AddressService interface {
 	Create(ctx context.Context, request web.AddressCreateRequest) web.AddressReponse
 	Update(ctx context.Context, request web.AddressUpdateRequest) web.AddressReponse
-	Delete(ctx context.Context, addressId int, userId int)
-	FindById(ctx context.Context, addressId int, userId int) web.AddressReponse
+	Delete(ctx context.Context, addressId string, userId int)
+	FindById(ctx context.Context, addressId string, userId int) web.AddressReponse
 	FindAll(ctx context.Context, userId int) []web.AddressReponse
 }

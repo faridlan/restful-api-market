@@ -17,8 +17,8 @@ func NewProdcutRepository() ProductRepository {
 }
 
 func (repository ProductRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
-	SQL := "insert into products (id_product, product_name, category_id, price, quantity, image_url) values (REPLACE(UUID(),'-',''),?,?,?,?,?)"
-	result, err := tx.ExecContext(ctx, SQL, product.ProductName, product.Category.Id, product.Price, product.Quantity, product.ImageUrl)
+	SQL := "insert into products (id_product, product_name, category_id, price, quantity, image_url) values (?,?,?,?,?,?)"
+	result, err := tx.ExecContext(ctx, SQL, product.IdProduct, product.ProductName, product.Category.Id, product.Price, product.Quantity, product.ImageUrl)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -31,8 +31,8 @@ func (repository ProductRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, pr
 
 func (repository ProductRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
 
-	SQL := "update products set product_name = ?, category_id = ?, price = ?, quantity = ?, image_url = ? where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, product.ProductName, product.Category.Id, product.Price, product.Quantity, product.ImageUrl, product.Id)
+	SQL := "update products set product_name = ?, category_id = ?, price = ?, quantity = ?, image_url = ? where id_product = ?"
+	_, err := tx.ExecContext(ctx, SQL, product.ProductName, product.Category.Id, product.Price, product.Quantity, product.ImageUrl, product.IdProduct)
 	helper.PanicIfError(err)
 
 	return product
@@ -40,17 +40,17 @@ func (repository ProductRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, 
 
 func (repository ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, product domain.Product) {
 
-	SQL := "delete from products where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, product.Id)
+	SQL := "delete from products where id_product = ?"
+	_, err := tx.ExecContext(ctx, SQL, product.IdProduct)
 	helper.PanicIfError(err)
 
 }
 
-func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
+func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId string) (domain.Product, error) {
 	SQL := `select p.id, p.id_product, p.product_name, c.id, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
 	from products as p
 	inner join categories as c on c.id = p.category_id
-	where p.id = ?`
+	where p.id_product = ?`
 	rows, err := tx.QueryContext(ctx, SQL, productId)
 	helper.PanicIfError(err)
 

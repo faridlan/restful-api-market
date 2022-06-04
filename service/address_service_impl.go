@@ -13,12 +13,14 @@ import (
 
 type AddressServiceImpl struct {
 	AddressRepo repository.AddressRepository
+	Uuid        repository.UuidRepository
 	DB          *sql.DB
 	Validate    *validator.Validate
 }
 
-func NewAddressService(addressRepo repository.AddressRepository, DB *sql.DB, validate *validator.Validate) AddressService {
+func NewAddressService(addressRepo repository.AddressRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) AddressService {
 	return AddressServiceImpl{
+		Uuid:        Uuid,
 		AddressRepo: addressRepo,
 		DB:          DB,
 		Validate:    validate,
@@ -33,10 +35,11 @@ func (service AddressServiceImpl) Create(ctx context.Context, request web.Addres
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
 	address := domain.Address{
-		User: domain.User{
-			Id: request.UserId,
-		},
+		IdAddress:       uuid.Uuid,
+		User:            domain.User{Id: request.UserId},
 		Name:            request.Name,
 		HandphoneNumber: request.HandphoneNumber,
 		Street:          request.Street,
@@ -58,10 +61,11 @@ func (service AddressServiceImpl) Update(ctx context.Context, request web.Addres
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	address, err := service.AddressRepo.FindById(ctx, tx, request.Id, request.UserId)
+	address, err := service.AddressRepo.FindById(ctx, tx, request.IdAddress, request.UserId)
 	helper.PanicIfError(err)
 
 	address.Id = request.Id
+	address.IdAddress = request.IdAddress
 	address.User.Id = request.UserId
 	address.Name = request.Name
 	address.HandphoneNumber = request.HandphoneNumber
@@ -75,7 +79,7 @@ func (service AddressServiceImpl) Update(ctx context.Context, request web.Addres
 	return helper.ToAddressResponse(address)
 }
 
-func (service AddressServiceImpl) Delete(ctx context.Context, addressId int, userId int) {
+func (service AddressServiceImpl) Delete(ctx context.Context, addressId string, userId int) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -86,7 +90,7 @@ func (service AddressServiceImpl) Delete(ctx context.Context, addressId int, use
 	service.AddressRepo.Delete(ctx, tx, address)
 }
 
-func (service AddressServiceImpl) FindById(ctx context.Context, addressId int, userId int) web.AddressReponse {
+func (service AddressServiceImpl) FindById(ctx context.Context, addressId string, userId int) web.AddressReponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)

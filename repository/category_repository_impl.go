@@ -18,8 +18,8 @@ func NewCategoryRepository() CategoryRepository {
 
 func (repository CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
 
-	SQL := "insert into categories(id_category,category_name) values (REPLACE(UUID(),'-',''),?)"
-	result, err := tx.ExecContext(ctx, SQL, category.CategoryName)
+	SQL := "insert into categories(id_category,category_name) values (?,?)"
+	result, err := tx.ExecContext(ctx, SQL, category.IdCategory, category.CategoryName)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -32,8 +32,8 @@ func (repository CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, c
 
 func (repository CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
 
-	SQL := "update categories set category_name = ? where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, category.CategoryName, category.Id)
+	SQL := "update categories set category_name = ? where id_category = ?"
+	_, err := tx.ExecContext(ctx, SQL, category.CategoryName, category.IdCategory)
 	helper.PanicIfError(err)
 
 	return category
@@ -41,14 +41,14 @@ func (repository CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx,
 
 func (repository CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, category domain.Category) {
 
-	SQL := "delete from categories where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, category.Id)
+	SQL := "delete from categories where id_category = ?"
+	_, err := tx.ExecContext(ctx, SQL, category.IdCategory)
 	helper.PanicIfError(err)
 
 }
 
-func (repository CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error) {
-	SQL := "select id, id_category, category_name from categories where id = ?"
+func (repository CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, categoryId string) (domain.Category, error) {
+	SQL := "select id, id_category, category_name from categories where id_category = ?"
 	rows, err := tx.QueryContext(ctx, SQL, categoryId)
 	helper.PanicIfError(err)
 

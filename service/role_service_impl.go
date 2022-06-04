@@ -13,13 +13,15 @@ import (
 
 type RoleServiceImpl struct {
 	RoleRepository repository.RoleRepository
+	Uuid           repository.UuidRepository
 	DB             *sql.DB
 	Validate       *validator.Validate
 }
 
-func NewRoleService(roleRepository repository.RoleRepository, DB *sql.DB, validate *validator.Validate) RoleService {
+func NewRoleService(roleRepository repository.RoleRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) RoleService {
 	return RoleServiceImpl{
 		RoleRepository: roleRepository,
+		Uuid:           Uuid,
 		DB:             DB,
 		Validate:       validate,
 	}
@@ -33,12 +35,16 @@ func (service RoleServiceImpl) Create(ctx context.Context, request web.RoleCreat
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
 	role := domain.Role{
-		Name: request.Name,
+		IdRole: uuid.Uuid,
+		Name:   request.Name,
 	}
 
 	role = service.RoleRepository.Save(ctx, tx, role)
-	role, err = service.RoleRepository.FindById(ctx, tx, role.Id)
+	role, err = service.RoleRepository.FindById(ctx, tx, role.IdRole)
 	helper.PanicIfError(err)
 
 	return helper.ToRoleResponse(role)
@@ -52,12 +58,24 @@ func (service RoleServiceImpl) Update(ctx context.Context, request web.RoleUpdat
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	role, err := service.RoleRepository.FindById(ctx, tx, request.Id)
+	role, err := service.RoleRepository.FindById(ctx, tx, request.IdRole)
 	helper.PanicIfError(err)
 
+	role.IdRole = request.IdRole
 	role.Name = request.Name
 
 	role = service.RoleRepository.Update(ctx, tx, role)
+
+	return helper.ToRoleResponse(role)
+}
+
+func (service RoleServiceImpl) FindById(ctx context.Context, roleId string) web.RoleResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	role, err := service.RoleRepository.FindById(ctx, tx, roleId)
+	helper.PanicIfError(err)
 
 	return helper.ToRoleResponse(role)
 }

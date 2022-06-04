@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -49,10 +48,8 @@ func (controller *AddressControllerImpl) Update(writer http.ResponseWriter, requ
 	helper.ReadFromRequestBody(request, &addressUpdateRequest)
 
 	addressId := params.ByName("addressId")
-	id, err := strconv.Atoi(addressId)
-	helper.PanicIfError(err)
 
-	addressUpdateRequest.Id = id
+	addressUpdateRequest.IdAddress = addressId
 	addressUpdateRequest.UserId = claim.Id
 	addressResponse := controller.AddressService.Update(request.Context(), addressUpdateRequest)
 	webResponse := web.WebResponse{
@@ -69,10 +66,8 @@ func (controller *AddressControllerImpl) Delete(writer http.ResponseWriter, requ
 	helper.ParseJwt(request, &claim)
 
 	addressId := params.ByName("addressId")
-	id, err := strconv.Atoi(addressId)
-	helper.PanicIfError(err)
 
-	controller.AddressService.Delete(request.Context(), id, claim.Id)
+	controller.AddressService.Delete(request.Context(), addressId, claim.Id)
 
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -88,10 +83,8 @@ func (controller *AddressControllerImpl) FindById(writer http.ResponseWriter, re
 	helper.ParseJwt(request, &claim)
 
 	addressId := params.ByName("addressId")
-	id, err := strconv.Atoi(addressId)
-	helper.PanicIfError(err)
 
-	addressResponse := controller.AddressService.FindById(request.Context(), id, claim.Id)
+	addressResponse := controller.AddressService.FindById(request.Context(), addressId, claim.Id)
 
 	webResponse := web.WebResponse{
 		Code:   200,

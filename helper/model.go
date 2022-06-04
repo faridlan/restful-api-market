@@ -8,6 +8,7 @@ import (
 func ToUserResponse(user domain.User) web.UserResponse {
 	return web.UserResponse{
 		Id:       user.Id,
+		IdUser:   user.IdUser,
 		Username: user.Username,
 		Email:    user.Email,
 		ImageUrl: user.ImageUrl,
@@ -31,6 +32,7 @@ func ToUserResponses(users []domain.User) []web.UserResponse {
 func ToJwtResponse(user web.Claims) web.Claims {
 	return web.Claims{
 		Id:               user.Id,
+		IdUser:           user.IdUser,
 		Username:         user.Username,
 		Email:            user.Email,
 		RoleId:           user.RoleId,
@@ -104,7 +106,8 @@ func ToCartResponses(carts []domain.Cart) []web.CartResponse {
 
 func ToAddressResponse(address domain.Address) web.AddressReponse {
 	return web.AddressReponse{
-		Id: address.Id,
+		Id:        address.Id,
+		IdAddress: address.IdAddress,
 		User: &web.UserResponse{
 			Id:       address.User.Id,
 			Username: address.User.Username,
@@ -200,29 +203,6 @@ func ToOrdersResponses(orders []domain.Order) []web.OrderResponse {
 	return ordersResponses
 }
 
-func ToCreateOrder(order web.CreateOrder) domain.OrderDetail {
-	return domain.OrderDetail{
-		Order: domain.Order{
-			User: domain.User{
-				Id: order.UserId,
-			},
-		},
-		Product: domain.Product{
-			Id: order.ProductId,
-		},
-		Quantity: order.Quantity,
-	}
-}
-
-func ToCreateOrders(orders []web.CreateOrder) []domain.OrderDetail {
-	createOrders := []domain.OrderDetail{}
-	for _, order := range orders {
-		createOrders = append(createOrders, ToCreateOrder(order))
-	}
-
-	return createOrders
-}
-
 func ToCartDelete(cart web.CartDeleteRequest) domain.Cart {
 	return domain.Cart{
 		User: domain.User{
@@ -249,7 +229,7 @@ func ToDeleteOrderCart(cart web.CreateOrder) domain.Cart {
 			Id: cart.UserId,
 		},
 		Product: domain.Product{
-			Id: cart.ProductId,
+			IdProduct: cart.ProductId,
 		},
 	}
 }
@@ -283,6 +263,7 @@ func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
 func ToStatusOrderResponse(statusOrder domain.StatusOrder) web.StatusOrderResponse {
 	return web.StatusOrderResponse{
 		Id:         statusOrder.Id,
+		IdStatus:   statusOrder.IdStatusOrder,
 		StatusName: statusOrder.StatusName,
 	}
 }
@@ -326,4 +307,42 @@ func ToSelectCartsRequest(carts []web.CartSelectRequest) []domain.Cart {
 	}
 
 	return cartsRequest
+}
+
+func ToFindProduct(order web.CreateOrder) domain.Product {
+	return domain.Product{
+		IdProduct: order.ProductId,
+	}
+}
+
+func ToFindProducts(orders []web.CreateOrder) []domain.Product {
+	ordersCreate := []domain.Product{}
+	for _, order := range orders {
+		ordersCreate = append(ordersCreate, ToFindProduct(order))
+	}
+
+	return ordersCreate
+}
+
+func ToCreateOrder(order web.CreateOrder) domain.OrderDetail {
+	return domain.OrderDetail{
+		Order: domain.Order{
+			User: domain.User{
+				Id: order.UserId,
+			},
+		},
+		Product: domain.Product{
+			IdProduct: order.ProductId,
+		},
+		Quantity: order.Quantity,
+	}
+}
+
+func ToCreateOrders(orders []web.CreateOrder) []domain.OrderDetail {
+	createOrders := []domain.OrderDetail{}
+	for _, order := range orders {
+		createOrders = append(createOrders, ToCreateOrder(order))
+	}
+
+	return createOrders
 }

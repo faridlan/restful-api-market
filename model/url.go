@@ -8,11 +8,11 @@ type Endpoint struct {
 func Endpoints() []Endpoint {
 	url := []Endpoint{
 		{
-			Url:    "/api/profiles",
+			Url:    "/api/users",
 			Method: "GET",
 		},
 		{
-			Url:    "/api/profile/:userId",
+			Url:    "/api/users/:userId",
 			Method: "GET",
 		},
 		{

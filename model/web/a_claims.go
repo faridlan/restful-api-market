@@ -12,6 +12,7 @@ var ExpiredTime = time.Now().Add(time.Minute * 60)
 
 type Claims struct {
 	Id       int    `json:"id,omitempty"`
+	IdUser   string `json:"id_user,omitempty"`
 	Username string `json:"username,omitempty"`
 	Email    string `json:"email,omitempty"`
 	RoleId   int    `json:"role_id,omitempty"`

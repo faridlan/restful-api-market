@@ -16,13 +16,15 @@ import (
 
 type ProductServiceImpl struct {
 	ProductRepository repository.ProductRepository
+	Uuid              repository.UuidRepository
 	DB                *sql.DB
 	Validate          *validator.Validate
 }
 
-func NewProductServie(productRepository repository.ProductRepository, DB *sql.DB, validate *validator.Validate) ProductService {
+func NewProductServie(productRepository repository.ProductRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ProductService {
 	return ProductServiceImpl{
 		ProductRepository: productRepository,
+		Uuid:              Uuid,
 		DB:                DB,
 		Validate:          validate,
 	}
@@ -33,7 +35,11 @@ func (service ProductServiceImpl) Create(ctx context.Context, request web.Produc
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
 	product := domain.Product{
+		IdProduct:   uuid.Uuid,
 		ProductName: request.ProductName,
 		Category: domain.Category{
 			Id: request.CategoryId,
@@ -53,9 +59,10 @@ func (service ProductServiceImpl) Update(ctx context.Context, request web.Produc
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	product, err := service.ProductRepository.FindById(ctx, tx, request.Id)
+	product, err := service.ProductRepository.FindById(ctx, tx, request.IdProduct)
 	helper.PanicIfError(err)
 
+	product.IdProduct = request.IdProduct
 	product.ProductName = request.ProductName
 	product.Category.Id = request.CategoryId
 	product.Price = request.Price
@@ -67,7 +74,7 @@ func (service ProductServiceImpl) Update(ctx context.Context, request web.Produc
 	return helper.ToProductResponse(product)
 }
 
-func (service ProductServiceImpl) Delete(ctx context.Context, productId int) {
+func (service ProductServiceImpl) Delete(ctx context.Context, productId string) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -78,7 +85,7 @@ func (service ProductServiceImpl) Delete(ctx context.Context, productId int) {
 	service.ProductRepository.Delete(ctx, tx, product)
 }
 
-func (service ProductServiceImpl) FindyId(ctx context.Context, productId int) web.ProductResponse {
+func (service ProductServiceImpl) FindyId(ctx context.Context, productId string) web.ProductResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)

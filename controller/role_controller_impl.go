@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -39,12 +38,23 @@ func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request
 	helper.ReadFromRequestBody(request, &updateRoleRequest)
 
 	roleId := params.ByName("roleId")
-	id, err := strconv.Atoi(roleId)
-	helper.PanicIfError(err)
 
-	updateRoleRequest.Id = id
+	updateRoleRequest.IdRole = roleId
 
 	roleResponse := controller.RoleService.Update(request.Context(), updateRoleRequest)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   roleResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *RoleControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	roleId := params.ByName("roleId")
+
+	roleResponse := controller.RoleService.FindById(request.Context(), roleId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

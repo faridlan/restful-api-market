@@ -3,7 +3,6 @@ package controller
 import (
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -56,10 +55,8 @@ func (controller *ShippingAddressControllerImpl) FindOrderById(writer http.Respo
 	helper.ParseJwt(request, &claim)
 
 	orderId := params.ByName("orderId")
-	id, err := strconv.Atoi(orderId)
-	helper.PanicIfError(err)
 
-	orderResponse := controller.ShippingAddressService.FindOrderById(request.Context(), id, claim.Id)
+	orderResponse := controller.ShippingAddressService.FindOrderById(request.Context(), orderId, claim.Id)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -102,9 +99,12 @@ func (controller *ShippingAddressControllerImpl) UpdatePayment(writer http.Respo
 	claim := web.Claims{}
 	helper.ParseJwt(request, &claim)
 
+	orderId := params.ByName("orderId")
+
 	orderUpdateRequest := web.OrderUpdateRequest{}
 	helper.ReadFromRequestBody(request, &orderUpdateRequest)
 
+	orderUpdateRequest.IdOrder = orderId
 	orderUpdateRequest.StatusId = 2
 	orderUpdateRequest.UserId = claim.Id
 
@@ -130,7 +130,7 @@ func (controller *ShippingAddressControllerImpl) CreateImg(writer http.ResponseW
 	helper.PanicIfError(err)
 
 	image := web.OrderUpdateRequest{
-		Image: string(fileBytes),
+		ImageUrl: string(fileBytes),
 	}
 
 	productResponse := controller.ShippingAddressService.UploadImage(request.Context(), image)
@@ -157,11 +157,9 @@ func (controller *ShippingAddressControllerImpl) FindAll(writer http.ResponseWri
 
 func (controller *ShippingAddressControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	orderId := params.ByName("id")
-	id, err := strconv.Atoi(orderId)
-	helper.PanicIfError(err)
+	orderId := params.ByName("orderId")
 
-	orderResponse := controller.ShippingAddressService.FindById(request.Context(), id)
+	orderResponse := controller.ShippingAddressService.FindById(request.Context(), orderId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

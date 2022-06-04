@@ -13,13 +13,15 @@ import (
 
 type StatusOrderServiceImpl struct {
 	Repository repository.StatusOrderRepository
+	Uuid       repository.UuidRepository
 	DB         *sql.DB
 	Validate   *validator.Validate
 }
 
-func NewStatusOrderService(repository repository.StatusOrderRepository, db *sql.DB, validate *validator.Validate) StatusOrderService {
+func NewStatusOrderService(repository repository.StatusOrderRepository, Uuid repository.UuidRepository, db *sql.DB, validate *validator.Validate) StatusOrderService {
 	return StatusOrderServiceImpl{
 		Repository: repository,
+		Uuid:       Uuid,
 		DB:         db,
 		Validate:   validate,
 	}
@@ -30,8 +32,12 @@ func (service StatusOrderServiceImpl) Create(ctx context.Context, request web.St
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
 	statusOrder := domain.StatusOrder{
-		StatusName: request.StatusName,
+		IdStatusOrder: uuid.Uuid,
+		StatusName:    request.StatusName,
 	}
 	statusOrder = service.Repository.Save(ctx, tx, statusOrder)
 
@@ -44,17 +50,17 @@ func (service StatusOrderServiceImpl) Update(ctx context.Context, request web.St
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	statusOrder, err := service.Repository.FindById(ctx, tx, request.Id)
+	statusOrder, err := service.Repository.FindById(ctx, tx, request.IdStatusOrder)
 	helper.PanicIfError(err)
 
-	statusOrder.Id = request.Id
+	statusOrder.IdStatusOrder = request.IdStatusOrder
 	statusOrder.StatusName = request.StatusName
 	statusOrder = service.Repository.Update(ctx, tx, statusOrder)
 
 	return helper.ToStatusOrderResponse(statusOrder)
 }
 
-func (service StatusOrderServiceImpl) Delete(ctx context.Context, statusId int) {
+func (service StatusOrderServiceImpl) Delete(ctx context.Context, statusId string) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -65,7 +71,7 @@ func (service StatusOrderServiceImpl) Delete(ctx context.Context, statusId int) 
 	service.Repository.Delete(ctx, tx, statusOrder)
 }
 
-func (service StatusOrderServiceImpl) FindById(ctx context.Context, statusId int) web.StatusOrderResponse {
+func (service StatusOrderServiceImpl) FindById(ctx context.Context, statusId string) web.StatusOrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)

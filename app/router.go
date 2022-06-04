@@ -31,13 +31,13 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/register", controller.AuthController.Register)
 	router.POST("/api/login", controller.AuthController.Login)
 	router.POST("/api/logout", controller.AuthController.Logout)
-	router.POST("/api/profiles/image", controller.AuthController.CreateImg) //UPLOAD IMAGE
+	router.POST("/api/profiles/image", controller.AuthController.CreateImg)
 	router.PUT("/api/profiles/:userId", controller.AuthController.UpdateProfile)
-	router.GET("/api/profiles/:userId", controller.AuthController.Profile) //FOR ADMIN
-	router.GET("/api/profiles", controller.AuthController.FindAll)         //GET ALL USERS
-	router.GET("/api/myprofile", controller.AuthController.MyProfile)
+	router.GET("/api/profiles", controller.AuthController.MyProfile)
+	router.GET("/api/users/:userId", controller.AuthController.Profile) // FOR ADMIN
+	router.GET("/api/users", controller.AuthController.FindAll)         // FOR ADMIN
 
-	//CATEGORIES
+	//CATEGORIES //FOR ADMIN
 	router.POST("/api/categories", controller.CategoryController.Create)
 	router.PUT("/api/categories/:categoryId", controller.CategoryController.Update)
 	// router.DELETE("/api/categories/:categoryId", controller.CategoryController.Delete) //NOT RECOMENDED
@@ -45,22 +45,22 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/categories", controller.CategoryController.FindAll)
 
 	//PRODUCTS
+	router.POST("/api/products", controller.ProductController.Create)           // FOR ADMIN
+	router.PUT("/api/products/:productId", controller.ProductController.Update) // FOR ADMIN
 	router.GET("/api/products", controller.ProductController.FindAll)
-	router.POST("/api/products", controller.ProductController.Create)
-	router.POST("/api/products/image", controller.ProductController.CreateImg)
-	router.PUT("/api/products/:productId", controller.ProductController.Update)
-	// router.DELETE("/api/products/:productId", controller.ProductController.Delete) //NOT RECOMENDED
 	router.GET("/api/products/:productId", controller.ProductController.FindById)
+	router.POST("/api/products/image", controller.ProductController.CreateImg)
+	// router.DELETE("/api/products/:productId", controller.ProductController.Delete) //NOT RECOMENDED
 
 	//ORDERS
 	router.POST("/api/orders", controller.ShippingAddressController.CreateOrder)
 	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
 	router.PUT("/api/status/order", controller.ShippingAddressController.UpdateStatus)
-	router.PUT("/api/payment/order", controller.ShippingAddressController.UpdatePayment)
-	router.GET("/api/user/orders/:orderId", controller.ShippingAddressController.FindOrderById)
-	router.GET("/api/user/orders", controller.ShippingAddressController.FindAllOrder)
-	router.GET("/api/order/:id", controller.ShippingAddressController.FindById)
-	router.GET("/api/orders", controller.ShippingAddressController.FindAll)
+	router.PUT("/api/payment/order/:orderId", controller.ShippingAddressController.UpdatePayment)
+	router.GET("/api/customer/orders/:orderId", controller.ShippingAddressController.FindOrderById)
+	router.GET("/api/customer/orders", controller.ShippingAddressController.FindAllOrder)
+	router.GET("/api/orders/:orderId", controller.ShippingAddressController.FindById) // FOR ADMIN
+	router.GET("/api/orders", controller.ShippingAddressController.FindAll)           // FOR ADMIN
 
 	//CARTS
 	router.POST("/api/carts", controller.ShoppingCartController.AddToCart)
@@ -69,16 +69,17 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.PUT("/api/carts/:productId", controller.ShoppingCartController.UpdateQty)
 	router.DELETE("/api/carts", controller.ShoppingCartController.DeleteCart)
 
-	//STATUSORDERS
+	//STATUSORDERS //FOR ADMIN
 	router.POST("/api/status-order", controller.StatusOrderController.Create)
 	router.PUT("/api/status-order/:statusId", controller.StatusOrderController.Update)
 	// router.DELETE("/api/statusOrder/:statusId", controller.StatusOrderController.Delete) //NOT RECOMENDED
 	router.GET("/api/status-order/:statusId", controller.StatusOrderController.FindById)
 	router.GET("/api/status-order", controller.StatusOrderController.FindAll)
 
-	//ROLE
+	//ROLE // FOR ADMIN
 	router.POST("/api/roles", controller.RoleController.Create)
 	router.PUT("/api/roles/:roleId", controller.RoleController.Update)
+	router.GET("/api/roles/:roleId", controller.RoleController.FindById)
 	router.GET("/api/roles", controller.RoleController.FindAll)
 
 	// router.PanicHandler = exception.ExceptionError

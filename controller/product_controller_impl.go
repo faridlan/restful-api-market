@@ -3,7 +3,6 @@ package controller
 import (
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -42,10 +41,8 @@ func (controller *ProductControllerImpl) Update(writer http.ResponseWriter, requ
 	helper.ReadFromRequestBody(request, &productUpdateRequest)
 
 	productId := params.ByName("productId")
-	id, err := strconv.Atoi(productId)
-	helper.PanicIfError(err)
 
-	productUpdateRequest.Id = id
+	productUpdateRequest.IdProduct = productId
 
 	productResponse := controller.ProductService.Update(request.Context(), productUpdateRequest)
 	webResponse := web.WebResponse{
@@ -59,10 +56,8 @@ func (controller *ProductControllerImpl) Update(writer http.ResponseWriter, requ
 
 func (controller *ProductControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	productId := params.ByName("productId")
-	id, err := strconv.Atoi(productId)
-	helper.PanicIfError(err)
 
-	controller.ProductService.Delete(request.Context(), id)
+	controller.ProductService.Delete(request.Context(), productId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -73,10 +68,8 @@ func (controller *ProductControllerImpl) Delete(writer http.ResponseWriter, requ
 
 func (controller *ProductControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	productId := params.ByName("productId")
-	id, err := strconv.Atoi(productId)
-	helper.PanicIfError(err)
 
-	productResponse := controller.ProductService.FindyId(request.Context(), id)
+	productResponse := controller.ProductService.FindyId(request.Context(), productId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

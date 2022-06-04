@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,16 +20,20 @@ type ShippingAddressServiceImpl struct {
 	OrderRepo       repository.OrderRepository
 	OrderDetailRepo repository.OrderDetailRepository
 	CartRepo        repository.CartRepository
+	AddressRepo     repository.AddressRepository
+	Uuid            repository.UuidRepository
 	DB              *sql.DB
 	Validate        *validator.Validate
 }
 
-func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, DB *sql.DB, validate *validator.Validate) ShippingAddressService {
+func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, AddressRepo repository.AddressRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ShippingAddressService {
 	return ShippingAddressServiceImpl{
 		ProductRepo:     productRepo,
 		OrderRepo:       orderRepo,
 		OrderDetailRepo: orderDetailRepo,
 		CartRepo:        cartRepo,
+		AddressRepo:     AddressRepo,
+		Uuid:            Uuid,
 		DB:              DB,
 		Validate:        validate,
 	}
@@ -42,34 +47,57 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
+	address, err := service.AddressRepo.FindById(ctx, tx, request.AddressId, request.UserId)
+	helper.PanicIfError(err)
+
 	createOrder := domain.Order{
+		IdOrder: uuid.Uuid,
 		User: domain.User{
 			Id: request.UserId,
 		},
 		Address: domain.Address{
-			Id: request.AddressId,
+			Id: address.Id,
 		},
 	}
 
-	orders := helper.ToCreateOrders(request.Detail)
+	x := []domain.Product{}
+	for _, v := range request.Detail {
+		defer log.Print(v.ProductId)
+		product, err := service.ProductRepo.FindById(ctx, tx, v.ProductId)
+		helper.PanicIfError(err)
+		x = append(x, product)
+	}
 
+	orders := helper.ToCreateOrders(request.Detail)
+	ordersCreate := []domain.OrderDetail{}
+	for i, v := range x {
+		z := orders[i]
+		z.Product.Id = v.Id
+		ordersCreate = append(ordersCreate, z)
+	}
 	//Create Order
 
 	createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
+	defer log.Print(createOrder)
+	defer log.Print(createOrder.Status.Id)
 
 	//Create Order Detail
-	service.OrderDetailRepo.Save(ctx, tx, orders)
+	service.OrderDetailRepo.Save(ctx, tx, ordersCreate)
 	//Update Total Price in Order Detail
-	service.OrderDetailRepo.UpdateTotal(ctx, tx, orders)
+	service.OrderDetailRepo.UpdateTotal(ctx, tx, ordersCreate)
 	//Update Product Quantity
-	service.OrderDetailRepo.UpdateProductQty(ctx, tx, orders)
+	service.OrderDetailRepo.UpdateProductQty(ctx, tx, ordersCreate)
 	//Update Total in Order
 	createOrder = service.OrderRepo.UpdateTotal(ctx, tx, createOrder)
 
 	//Make Response Order
 	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
 	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-	orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
+	defer log.Print(createOrder.IdOrder)
+	orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.IdOrder, createOrder.User.Id)
 	helper.PanicIfError(err)
 
 	//Delete Cart
@@ -78,15 +106,15 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 
 }
 
-func (service ShippingAddressServiceImpl) FindOrderById(ctx context.Context, orderId int, userId int) web.OrderResponse {
+func (service ShippingAddressServiceImpl) FindOrderById(ctx context.Context, orderId string, userId int) web.OrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, orderId, userId)
-	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
 	order, err := service.OrderRepo.FindById(ctx, tx, orderId, userId)
 	helper.PanicIfError(err)
+	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, order.Id, userId)
+	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
 	return helper.ToOrderResponse(order, ordersDetail)
 }
 
@@ -108,7 +136,7 @@ func (service ShippingAddressServiceImpl) UpdateStatus(ctx context.Context, requ
 
 	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
 	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-	order, err := service.OrderRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	order, err := service.OrderRepo.FindById(ctx, tx, request.IdOrder, request.UserId)
 	helper.PanicIfError(err)
 
 	order.Status.Id = request.StatusId
@@ -134,12 +162,14 @@ func (service ShippingAddressServiceImpl) UpdatePayment(ctx context.Context, req
 	order.Status.Id = request.StatusId
 	order.Payment = stringX
 	// order.Payment = request.Payment
-	order.Id = request.OrderId
+	order.IdOrder = request.IdOrder
 	order.User.Id = request.UserId
 
 	order = service.OrderRepo.UpdatePayment(ctx, tx, order)
 	order = service.OrderRepo.UpdateStatus(ctx, tx, order)
 
+	order, err = service.OrderRepo.FindById(ctx, tx, request.IdOrder, request.UserId)
+	helper.PanicIfError(err)
 	return helper.ToOrderResponse(order, ordersDetail)
 
 }
@@ -175,7 +205,7 @@ func (service ShippingAddressServiceImpl) FindAll(ctx context.Context) []web.Ord
 	return helper.ToOrdersResponses(orders)
 }
 
-func (service ShippingAddressServiceImpl) FindById(ctx context.Context, orderId int) web.OrderResponse {
+func (service ShippingAddressServiceImpl) FindById(ctx context.Context, orderId string) web.OrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)

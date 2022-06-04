@@ -17,8 +17,8 @@ func NewRoleRepository() RoleRepository {
 }
 
 func (repository RoleRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, role domain.Role) domain.Role {
-	SQL := "insert into roles(id_role, role_name) values (REPLACE(UUID(),'-',''),?)"
-	result, err := tx.ExecContext(ctx, SQL, role.Name)
+	SQL := "insert into roles(id_role, role_name) values (?,?)"
+	result, err := tx.ExecContext(ctx, SQL, role.IdRole, role.Name)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -30,15 +30,15 @@ func (repository RoleRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, role 
 }
 
 func (repository RoleRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, role domain.Role) domain.Role {
-	SQL := "update roles set role_name = ? where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, role.Name, role.Id)
+	SQL := "update roles set role_name = ? where id_role = ?"
+	_, err := tx.ExecContext(ctx, SQL, role.Name, role.IdRole)
 	helper.PanicIfError(err)
 
 	return role
 }
 
-func (repository RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, roleId int) (domain.Role, error) {
-	SQL := "select id, id_role, role_name from roles where id = ?"
+func (repository RoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, roleId string) (domain.Role, error) {
+	SQL := "select id, id_role, role_name from roles where id_role = ?"
 	rows, err := tx.QueryContext(ctx, SQL, roleId)
 	helper.PanicIfError(err)
 

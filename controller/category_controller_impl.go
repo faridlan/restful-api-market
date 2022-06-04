@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -40,10 +39,8 @@ func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, req
 	helper.ReadFromRequestBody(request, &categoryUpdateRequest)
 
 	categoryId := params.ByName("categoryId")
-	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
 
-	categoryUpdateRequest.Id = id
+	categoryUpdateRequest.IdCategory = categoryId
 
 	categoryResponse := controller.Category.Update(request.Context(), categoryUpdateRequest)
 	webResponse := web.WebResponse{
@@ -57,10 +54,8 @@ func (controller *CategoryControllerImpl) Update(writer http.ResponseWriter, req
 
 func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryId := params.ByName("categoryId")
-	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
 
-	controller.Category.Delete(request.Context(), id)
+	controller.Category.Delete(request.Context(), categoryId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -71,10 +66,8 @@ func (controller *CategoryControllerImpl) Delete(writer http.ResponseWriter, req
 
 func (controller *CategoryControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	categoryId := params.ByName("categoryId")
-	id, err := strconv.Atoi(categoryId)
-	helper.PanicIfError(err)
 
-	categoryResponse := controller.Category.FindById(request.Context(), id)
+	categoryResponse := controller.Category.FindById(request.Context(), categoryId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

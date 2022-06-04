@@ -3,7 +3,6 @@ package controller
 import (
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/faridlan/restful-api-market/helper"
@@ -62,7 +61,7 @@ func (controller *AuthControllerImpl) MyProfile(writer http.ResponseWriter, requ
 	claim := &web.Claims{}
 	claims := helper.ParseJwt(request, claim)
 
-	userResponse := controller.AuthService.Profile(request.Context(), claims.Id)
+	userResponse := controller.AuthService.Profile(request.Context(), claims.IdUser)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -74,10 +73,8 @@ func (controller *AuthControllerImpl) MyProfile(writer http.ResponseWriter, requ
 
 func (controller AuthControllerImpl) Profile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userId := params.ByName("userId")
-	id, err := strconv.Atoi(userId)
-	helper.PanicIfError(err)
 
-	userResponse := controller.AuthService.Profile(request.Context(), id)
+	userResponse := controller.AuthService.Profile(request.Context(), userId)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
@@ -92,10 +89,8 @@ func (controller *AuthControllerImpl) UpdateProfile(writer http.ResponseWriter, 
 	helper.ReadFromRequestBody(request, &userUpdateRequest)
 
 	userId := params.ByName("userId")
-	id, err := strconv.Atoi(userId)
-	helper.PanicIfError(err)
 
-	userUpdateRequest.Id = id
+	userUpdateRequest.IdUser = userId
 
 	userResponse := controller.AuthService.UpdateProfile(request.Context(), userUpdateRequest)
 	webResponse := web.WebResponse{

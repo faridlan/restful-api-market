@@ -1,6 +1,7 @@
 package domain
 
 type StatusOrder struct {
-	Id         int
-	StatusName string
+	Id            int
+	IdStatusOrder string
+	StatusName    string
 }
