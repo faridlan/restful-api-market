@@ -9,7 +9,12 @@ import (
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	enTranslations "github.com/go-playground/validator/v10/translations/en"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
+)
+
+var (
+	uni      *ut.UniversalTranslator
+	validate *validator.Validate
 )
 
 func ExceptionError(writer http.ResponseWriter, request *http.Request, err interface{}) {
@@ -88,42 +93,22 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err interf
 
 }
 
-// func translateError(err error, trans ut.Translator) (errs []error) {
-// 	if err == nil {
-// 		return nil
-// 	}
-// 	validatorErrs := err.(validator.ValidationErrors)
-// 	for _, e := range validatorErrs {
-// 		translatedErr := fmt.Errorf(e.Translate(trans))
-// 		errs = append(errs, translatedErr)
-// 	}
-// 	return errs
-// }
-
 func validationError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
 	exception, ok := err.(validator.ValidationErrors)
 
 	if ok {
 		writer.Header().Add("content-type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
-
-		validate := validator.New()
-		english := en.New()
-		uni := ut.New(english, english)
+		en := en.New()
+		uni = ut.New(en, en)
 		trans, _ := uni.GetTranslator("en")
-		_ = enTranslations.RegisterDefaultTranslations(validate, trans)
-
-		var errs []interface{}
-
-		for _, v := range exception {
-			translateErr := v.Translate(trans)
-			errs = append(errs, translateErr)
-		}
+		validate = validator.New()
+		en_translations.RegisterDefaultTranslations(validate, trans)
 
 		webResponse := web.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   errs,
+			Data:   exception.Translate(trans),
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)

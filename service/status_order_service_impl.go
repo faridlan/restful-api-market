@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -28,6 +29,9 @@ func NewStatusOrderService(repository repository.StatusOrderRepository, Uuid rep
 }
 
 func (service StatusOrderServiceImpl) Create(ctx context.Context, request web.StatusOrderCreate) web.StatusOrderResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -48,10 +52,13 @@ func (service StatusOrderServiceImpl) Create(ctx context.Context, request web.St
 func (service StatusOrderServiceImpl) Update(ctx context.Context, request web.StatusOrderUpdate) web.StatusOrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
+
 	defer helper.CommitOrRollbak(tx)
 
 	statusOrder, err := service.Repository.FindById(ctx, tx, request.IdStatusOrder)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	statusOrder.IdStatusOrder = request.IdStatusOrder
 	statusOrder.StatusName = request.StatusName
@@ -77,7 +84,9 @@ func (service StatusOrderServiceImpl) FindById(ctx context.Context, statusId str
 	defer helper.CommitOrRollbak(tx)
 
 	statusOrder, err := service.Repository.FindById(ctx, tx, statusId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToStatusOrderResponse(statusOrder)
 }

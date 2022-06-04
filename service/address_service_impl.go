@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -62,7 +63,9 @@ func (service AddressServiceImpl) Update(ctx context.Context, request web.Addres
 	defer helper.CommitOrRollbak(tx)
 
 	address, err := service.AddressRepo.FindById(ctx, tx, request.IdAddress, request.UserId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	address.Id = request.Id
 	address.IdAddress = request.IdAddress
@@ -85,7 +88,9 @@ func (service AddressServiceImpl) Delete(ctx context.Context, addressId string, 
 	defer helper.CommitOrRollbak(tx)
 
 	address, err := service.AddressRepo.FindById(ctx, tx, addressId, userId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	service.AddressRepo.Delete(ctx, tx, address)
 }
@@ -96,7 +101,9 @@ func (service AddressServiceImpl) FindById(ctx context.Context, addressId string
 	defer helper.CommitOrRollbak(tx)
 
 	address, err := service.AddressRepo.FindById(ctx, tx, addressId, userId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToAddressResponse(address)
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -51,7 +52,9 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	helper.PanicIfError(err)
 
 	address, err := service.AddressRepo.FindById(ctx, tx, request.AddressId, request.UserId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	createOrder := domain.Order{
 		IdOrder: uuid.Uuid,
@@ -67,7 +70,9 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	for _, v := range request.Detail {
 		defer log.Print(v.ProductId)
 		product, err := service.ProductRepo.FindById(ctx, tx, v.ProductId)
-		helper.PanicIfError(err)
+		if err != nil {
+			panic(exception.NewNotFoundError(err.Error()))
+		}
 		x = append(x, product)
 	}
 
@@ -81,8 +86,6 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	//Create Order
 
 	createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
-	defer log.Print(createOrder)
-	defer log.Print(createOrder.Status.Id)
 
 	//Create Order Detail
 	service.OrderDetailRepo.Save(ctx, tx, ordersCreate)
@@ -98,7 +101,9 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
 	defer log.Print(createOrder.IdOrder)
 	orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.IdOrder, createOrder.User.Id)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	//Delete Cart
 
@@ -149,6 +154,9 @@ func (service ShippingAddressServiceImpl) UpdateStatus(ctx context.Context, requ
 }
 
 func (service ShippingAddressServiceImpl) UpdatePayment(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)

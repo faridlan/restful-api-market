@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -59,7 +60,9 @@ func (service CategoryServiceImpl) Update(ctx context.Context, request web.Categ
 	defer helper.CommitOrRollbak(tx)
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, request.IdCategory)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	category.IdCategory = request.IdCategory
 	category.CategoryName = request.CategoryName
@@ -75,7 +78,9 @@ func (service CategoryServiceImpl) Delete(ctx context.Context, categoryId string
 	defer helper.CommitOrRollbak(tx)
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, categoryId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	service.CategoryRepo.Delete(ctx, tx, category)
 }
@@ -86,7 +91,9 @@ func (service CategoryServiceImpl) FindById(ctx context.Context, categoryId stri
 	defer helper.CommitOrRollbak(tx)
 
 	category, err := service.CategoryRepo.FindById(ctx, tx, categoryId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToCategoryResponse(category)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -131,12 +132,17 @@ func (service AuthServiceImpl) Profile(ctx context.Context, userId string) web.U
 	defer helper.CommitOrRollbak(tx)
 
 	user, err := service.UserRepository.FindById(ctx, tx, userId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToUserResponse(user)
 }
 
 func (service AuthServiceImpl) UpdateProfile(ctx context.Context, request web.UserUpdateRequest) web.UserResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
@@ -144,7 +150,9 @@ func (service AuthServiceImpl) UpdateProfile(ctx context.Context, request web.Us
 	stringImg := helper.NewNullString(request.ImageUrl)
 
 	user, err := service.UserRepository.FindById(ctx, tx, request.IdUser)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	user.IdUser = request.IdUser
 	user.Username = request.Username

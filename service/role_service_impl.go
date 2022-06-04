@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -45,7 +46,9 @@ func (service RoleServiceImpl) Create(ctx context.Context, request web.RoleCreat
 
 	role = service.RoleRepository.Save(ctx, tx, role)
 	role, err = service.RoleRepository.FindById(ctx, tx, role.IdRole)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToRoleResponse(role)
 }
@@ -59,7 +62,9 @@ func (service RoleServiceImpl) Update(ctx context.Context, request web.RoleUpdat
 	defer helper.CommitOrRollbak(tx)
 
 	role, err := service.RoleRepository.FindById(ctx, tx, request.IdRole)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	role.IdRole = request.IdRole
 	role.Name = request.Name
@@ -75,7 +80,9 @@ func (service RoleServiceImpl) FindById(ctx context.Context, roleId string) web.
 	defer helper.CommitOrRollbak(tx)
 
 	role, err := service.RoleRepository.FindById(ctx, tx, roleId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToRoleResponse(role)
 }

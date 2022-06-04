@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -60,7 +61,9 @@ func (service ProductServiceImpl) Update(ctx context.Context, request web.Produc
 	defer helper.CommitOrRollbak(tx)
 
 	product, err := service.ProductRepository.FindById(ctx, tx, request.IdProduct)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	product.IdProduct = request.IdProduct
 	product.ProductName = request.ProductName
@@ -80,7 +83,9 @@ func (service ProductServiceImpl) Delete(ctx context.Context, productId string) 
 	defer helper.CommitOrRollbak(tx)
 
 	product, err := service.ProductRepository.FindById(ctx, tx, productId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	service.ProductRepository.Delete(ctx, tx, product)
 }
@@ -91,7 +96,9 @@ func (service ProductServiceImpl) FindyId(ctx context.Context, productId string)
 	defer helper.CommitOrRollbak(tx)
 
 	product, err := service.ProductRepository.FindById(ctx, tx, productId)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToProductResponse(product)
 }
