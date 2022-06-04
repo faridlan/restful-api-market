@@ -29,6 +29,19 @@ func (repository UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user 
 	return user
 }
 
+func (repository UserRepositoryImpl) SaveUsers(ctx context.Context, tx *sql.Tx, user domain.User) domain.User {
+	SQL := "insert into users (id_user,username,email,password, role_id) values (?,?,?,?,?)"
+	result, err := tx.ExecContext(ctx, SQL, user.IdUser, user.Username, user.Email, user.Password, user.Role.Id)
+	helper.PanicIfError(err)
+
+	id, err := result.LastInsertId()
+	helper.PanicIfError(err)
+
+	user.Id = int(id)
+
+	return user
+}
+
 func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
 	SQL := "select id,id_user,username,email,role_id from users where (username =? or email =?) and password =?"
 	// SQL := "select id,username,email from users where (username =? or email =?) and password =?"

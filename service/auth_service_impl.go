@@ -62,6 +62,35 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 	return helper.ToUserResponse(user)
 }
 
+func (service AuthServiceImpl) CreateUsers(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
+	stringImg := helper.NewNullString(request.ImageUrl)
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	uuid, err := service.Uuid.CreteUui(ctx, tx)
+	helper.PanicIfError(err)
+
+	user := domain.User{
+		IdUser:   uuid.Uuid,
+		Username: request.Username,
+		Email:    request.Email,
+		Password: request.Password,
+		ImageUrl: stringImg,
+		Role: domain.Role{
+			Id: request.RoleId,
+		},
+	}
+
+	user = service.UserRepository.Save(ctx, tx, user)
+
+	return helper.ToUserResponse(user)
+}
+
 func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreateRequest) web.Claims {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)

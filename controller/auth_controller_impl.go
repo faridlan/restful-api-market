@@ -37,6 +37,21 @@ func (controller *AuthControllerImpl) Register(writer http.ResponseWriter, reque
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+func (controller *AuthControllerImpl) CreateUsers(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userCreateRequest := web.UserCreateRequest{}
+	helper.ReadFromRequestBody(request, &userCreateRequest)
+
+	userResponse := controller.AuthService.Register(request.Context(), userCreateRequest)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	loginCreateRequest := web.LoginCreateRequest{}
 	helper.ReadFromRequestBody(request, &loginCreateRequest)

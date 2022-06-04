@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/faridlan/restful-api-market/controller"
+	"github.com/faridlan/restful-api-market/exception"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -34,6 +35,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/profiles/image", controller.AuthController.CreateImg)
 	router.PUT("/api/profiles/:userId", controller.AuthController.UpdateProfile)
 	router.GET("/api/profiles", controller.AuthController.MyProfile)
+	router.POST("/api/users", controller.AuthController.CreateUsers)    //FOR ADMIN
 	router.GET("/api/users/:userId", controller.AuthController.Profile) // FOR ADMIN
 	router.GET("/api/users", controller.AuthController.FindAll)         // FOR ADMIN
 
@@ -56,7 +58,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/orders", controller.ShippingAddressController.CreateOrder)
 	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
 	router.PUT("/api/status/order", controller.ShippingAddressController.UpdateStatus)
-	router.PUT("/api/payment/order/:orderId", controller.ShippingAddressController.UpdatePayment)
+	router.PUT("/api/payment/orders/:orderId", controller.ShippingAddressController.UpdatePayment)
 	router.GET("/api/customer/orders/:orderId", controller.ShippingAddressController.FindOrderById)
 	router.GET("/api/customer/orders", controller.ShippingAddressController.FindAllOrder)
 	router.GET("/api/orders/:orderId", controller.ShippingAddressController.FindById) // FOR ADMIN
@@ -82,7 +84,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.GET("/api/roles/:roleId", controller.RoleController.FindById)
 	router.GET("/api/roles", controller.RoleController.FindAll)
 
-	// router.PanicHandler = exception.ExceptionError
+	router.PanicHandler = exception.ExceptionError
 
 	return router
 }
