@@ -8,7 +8,7 @@ import (
 
 var JwtSigningMEethod = jwt.SigningMethodHS256
 var JwtSecret = []byte("Anj1ngAd4l4hH3w4nuuAAii8sdA73DFed7")
-var ExpiredTime = time.Now().Add(time.Minute * 60)
+var ExpiredTime = time.Now().Add(time.Hour * 24)
 
 type Claims struct {
 	Id       int    `json:"id,omitempty"`
