@@ -80,7 +80,8 @@ func (controller *ProductControllerImpl) FindById(writer http.ResponseWriter, re
 }
 
 func (controller *ProductControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	productResponses := controller.ProductService.FindAll(request.Context())
+	pagination := helper.Pagination(request)
+	productResponses := controller.ProductService.FindAll(request.Context(), pagination)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

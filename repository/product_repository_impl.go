@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
@@ -65,11 +66,12 @@ func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx
 	}
 }
 
-func (repository ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Product {
+func (repository ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Product {
 
-	SQL := `select p.id, p.id_product, p.product_name, c.id, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
+	SQL := fmt.Sprintf(`select p.id, p.id_product, p.product_name, c.id, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
 	from products as p
-	inner join categories as c on c.id = p.category_id`
+	inner join categories as c on c.id = p.category_id
+	order by p.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 

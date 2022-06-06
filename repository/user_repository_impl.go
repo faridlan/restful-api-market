@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
@@ -80,9 +81,10 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 	}
 }
 
-func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := `select u.id,u.id_user,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
-	inner join roles as r on u.role_id = r.id`
+func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.User {
+	SQL := fmt.Sprintf(`select u.id,u.id_user,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
+	inner join roles as r on u.role_id = r.id
+	order by u.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 

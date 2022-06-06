@@ -178,12 +178,12 @@ func (service AuthServiceImpl) Logout(ctx context.Context, request web.Blacklist
 	return helper.ToBlacklistResponse(blacklist)
 }
 
-func (service AuthServiceImpl) FindAll(ctx context.Context) []web.UserResponse {
+func (service AuthServiceImpl) FindAll(ctx context.Context, pagination domain.Pagination) []web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	users := service.UserRepository.FindAll(ctx, tx)
+	users := service.UserRepository.FindAll(ctx, tx, pagination)
 
 	return helper.ToUserResponses(users)
 }

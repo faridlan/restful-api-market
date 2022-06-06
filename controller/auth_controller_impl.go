@@ -118,8 +118,8 @@ func (controller *AuthControllerImpl) UpdateProfile(writer http.ResponseWriter, 
 }
 
 func (controller *AuthControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
-	userResponses := controller.AuthService.FindAll(request.Context())
+	pagination := helper.Pagination(request)
+	userResponses := controller.AuthService.FindAll(request.Context(), pagination)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

@@ -123,12 +123,12 @@ func (service ShippingAddressServiceImpl) FindOrderById(ctx context.Context, ord
 	return helper.ToOrderResponse(order, ordersDetail)
 }
 
-func (service ShippingAddressServiceImpl) FindAllOrderByUser(ctx context.Context, userId int) []web.OrderResponse {
+func (service ShippingAddressServiceImpl) FindAllOrderByUser(ctx context.Context, userId int, pagination domain.Pagination) []web.OrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	orders, err := service.OrderRepo.FindByUserId(ctx, tx, userId)
+	orders, err := service.OrderRepo.FindByUserId(ctx, tx, userId, pagination)
 	helper.PanicIfError(err)
 
 	return helper.ToOrdersResponses(orders)
@@ -203,12 +203,12 @@ func (service ShippingAddressServiceImpl) UploadImage(ctx context.Context, reque
 	return image
 }
 
-func (service ShippingAddressServiceImpl) FindAll(ctx context.Context) []web.OrderResponse {
+func (service ShippingAddressServiceImpl) FindAll(ctx context.Context, pagination domain.Pagination) []web.OrderResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	orders := service.OrderRepo.FindAll(ctx, tx)
+	orders := service.OrderRepo.FindAll(ctx, tx, pagination)
 
 	return helper.ToOrdersResponses(orders)
 }

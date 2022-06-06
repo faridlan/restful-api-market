@@ -69,8 +69,9 @@ func (controller *ShippingAddressControllerImpl) FindOrderById(writer http.Respo
 func (controller *ShippingAddressControllerImpl) FindAllOrder(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	claim := web.Claims{}
 	helper.ParseJwt(request, &claim)
+	pagination := helper.Pagination(request)
 
-	orderResponses := controller.ShippingAddressService.FindAllOrderByUser(request.Context(), claim.Id)
+	orderResponses := controller.ShippingAddressService.FindAllOrderByUser(request.Context(), claim.Id, pagination)
 
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -144,7 +145,8 @@ func (controller *ShippingAddressControllerImpl) CreateImg(writer http.ResponseW
 }
 
 func (controller *ShippingAddressControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	orderResponses := controller.ShippingAddressService.FindAll(request.Context())
+	pagination := helper.Pagination(request)
+	orderResponses := controller.ShippingAddressService.FindAll(request.Context(), pagination)
 
 	webResponse := web.WebResponse{
 		Code:   200,

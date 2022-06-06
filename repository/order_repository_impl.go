@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
@@ -53,12 +54,13 @@ func (repository OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 	}
 }
 
-func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Order, error) {
-	SQL := `select o.id, o.id_order, u.username,
+func (repository OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int, pagination domain.Pagination) ([]domain.Order, error) {
+	SQL := fmt.Sprintf(`select o.id, o.id_order, u.username,
 	o.total, o.order_date, s.id, s.status_name, o.payment from orders as o
 	inner join users as u on u.id = o.user_id
 	inner join status_order as s on s.id = o.status_id
-	where o.user_id = ?`
+	where o.user_id = ?
+	order by o.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	helper.PanicIfError(err)
@@ -102,11 +104,12 @@ func (repository OrderRepositoryImpl) UpdatePayment(ctx context.Context, tx *sql
 	return order
 }
 
-func (repository OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Order {
-	SQL := `select o.id, o.id_order, u.username,
+func (repository OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Order {
+	SQL := fmt.Sprintf(`select o.id, o.id_order, u.username,
 	o.total, o.order_date, s.id, s.status_name, o.payment from orders as o
 	inner join users as u on u.id = o.user_id
-	inner join status_order as s on s.id = o.status_id`
+	inner join status_order as s on s.id = o.status_id
+	order by o.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)

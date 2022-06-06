@@ -103,12 +103,12 @@ func (service ProductServiceImpl) FindyId(ctx context.Context, productId string)
 	return helper.ToProductResponse(product)
 }
 
-func (service ProductServiceImpl) FindAll(ctx context.Context) []web.ProductResponse {
+func (service ProductServiceImpl) FindAll(ctx context.Context, pagination domain.Pagination) []web.ProductResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	productResponses := service.ProductRepository.FindAll(ctx, tx)
+	productResponses := service.ProductRepository.FindAll(ctx, tx, pagination)
 
 	return helper.ToProductResponses(productResponses)
 }

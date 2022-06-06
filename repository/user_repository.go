@@ -12,6 +12,6 @@ type UserRepository interface {
 	SaveUsers(ctx context.Context, tx *sql.Tx, user domain.User) domain.User
 	Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error)
 	FindById(ctx context.Context, tx *sql.Tx, userId string) (domain.User, error)
-	FindAll(ctx context.Context, tx *sql.Tx) []domain.User
+	FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.User
 	Update(ctx context.Context, tx *sql.Tx, user domain.User) domain.User
 }
