@@ -346,3 +346,27 @@ func ToCreateOrders(orders []web.CreateOrder) []domain.OrderDetail {
 
 	return createOrders
 }
+
+// func ToRegisterResponse()  {
+// 	return web.Claims{
+// 		Id:               user.Id,
+// 		IdUser:           user.IdUser,
+// 		Username:         user.Username,
+// 		Email:            user.Email,
+// 		RoleId:           user.RoleId,
+// 		Token:            user.Token,
+// 		RegisteredClaims: user.RegisteredClaims,
+// 	}
+// 	return web.UserResponse{
+// 		Id:       user.Id,
+// 		IdUser:   user.IdUser,
+// 		Username: user.Username,
+// 		Email:    user.Email,
+// 		ImageUrl: user.ImageUrl,
+// 		Role: &web.RoleResponse{
+// 			Id:     user.Role.Id,
+// 			IdRole: user.Role.IdRole,
+// 			Name:   user.Role.Name,
+// 		},
+// 	}
+// }

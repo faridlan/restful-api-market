@@ -8,7 +8,7 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, request web.UserCreateRequest) web.UserResponse
+	Register(ctx context.Context, request web.UserCreateRequest) (web.UserResponse, web.Claims)
 	CreateUsers(ctx context.Context, request web.UserCreateRequest) web.UserResponse
 	Login(ctx context.Context, request web.LoginCreateRequest) web.Claims
 	Profile(ctx context.Context, userId string) web.UserResponse

@@ -26,7 +26,13 @@ func (controller *AuthControllerImpl) Register(writer http.ResponseWriter, reque
 	userCreateRequest := web.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
-	userResponse := controller.AuthService.Register(request.Context(), userCreateRequest)
+	userResponse, claims := controller.AuthService.Register(request.Context(), userCreateRequest)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(web.JwtSecret)
+	helper.PanicIfError(err)
+
+	userResponse.Token = tokenString
 
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -41,7 +47,7 @@ func (controller *AuthControllerImpl) CreateUsers(writer http.ResponseWriter, re
 	userCreateRequest := web.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
-	userResponse := controller.AuthService.Register(request.Context(), userCreateRequest)
+	userResponse, _ := controller.AuthService.Register(request.Context(), userCreateRequest)
 
 	webResponse := web.WebResponse{
 		Code:   200,

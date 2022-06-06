@@ -34,7 +34,7 @@ func NewAuthService(userRepository repository.UserRepository, blacklistRepositor
 	}
 }
 
-func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
+func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCreateRequest) (web.UserResponse, web.Claims) {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -59,8 +59,27 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 	}
 
 	user = service.UserRepository.Save(ctx, tx, user)
+	user, err = service.UserRepository.FindById(ctx, tx, user.IdUser)
+	helper.PanicIfError(err)
 
-	return helper.ToUserResponse(user)
+	random := helper.RandStringRunes(20)
+
+	claim := web.Claims{
+		Id:       user.Id,
+		IdUser:   user.IdUser,
+		Username: user.Username,
+		Email:    user.Email,
+		RoleId:   user.Role.Id,
+		Token:    random,
+		RegisteredClaims: &jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(web.ExpiredTime),
+		},
+	}
+
+	claimResult := helper.ToJwtResponse(claim)
+	userResult := helper.ToUserResponse(user)
+
+	return userResult, claimResult
 }
 
 func (service AuthServiceImpl) CreateUsers(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
