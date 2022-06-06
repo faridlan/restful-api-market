@@ -62,16 +62,18 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 	loginCreateRequest := web.LoginCreateRequest{}
 	helper.ReadFromRequestBody(request, &loginCreateRequest)
 
-	claims := controller.AuthService.Login(request.Context(), loginCreateRequest)
+	user, claims := controller.AuthService.Login(request.Context(), loginCreateRequest)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(web.JwtSecret)
 	helper.PanicIfError(err)
 
+	user.Token = tokenString
+
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
-		Data:   tokenString,
+		Data:   user,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

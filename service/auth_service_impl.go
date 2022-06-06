@@ -111,7 +111,7 @@ func (service AuthServiceImpl) CreateUsers(ctx context.Context, request web.User
 	return helper.ToUserResponse(user)
 }
 
-func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreateRequest) web.Claims {
+func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreateRequest) (web.UserResponse, web.Claims) {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -129,6 +129,8 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 
 	user, err = service.UserRepository.Login(ctx, tx, user)
 	helper.PanicIfError(err)
+	user, err = service.UserRepository.FindById(ctx, tx, user.IdUser)
+	helper.PanicIfError(err)
 
 	claim := web.Claims{
 		Id:       user.Id,
@@ -142,7 +144,10 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 		},
 	}
 
-	return helper.ToJwtResponse(claim)
+	claimResult := helper.ToJwtResponse(claim)
+	userResult := helper.ToUserResponse(user)
+
+	return userResult, claimResult
 }
 
 func (service AuthServiceImpl) Profile(ctx context.Context, userId string) web.UserResponse {
