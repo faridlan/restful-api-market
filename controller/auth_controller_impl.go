@@ -145,11 +145,10 @@ func (controller *AuthControllerImpl) Logout(writer http.ResponseWriter, request
 	}
 
 	controller.AuthService.Logout(request.Context(), blacklistCreate)
-	writer.WriteHeader(http.StatusUnauthorized)
 	webResponse := web.WebResponse{
-		Code:   http.StatusUnauthorized,
-		Status: "UNAUTHORIZED",
-		Data:   nil,
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   "",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
