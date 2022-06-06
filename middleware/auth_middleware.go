@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model"
 	"github.com/faridlan/restful-api-market/model/web"
@@ -83,7 +82,17 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 		})
 
 		if err != nil {
-			panic(exception.NewUnauthError(err.Error()))
+			writer.Header().Add("Content-Type", "application/json")
+			writer.WriteHeader(http.StatusUnauthorized)
+			webResponse := web.WebResponse{
+				Code:   http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Data:   err.Error(),
+			}
+
+			helper.WriteToResponseBody(writer, webResponse)
+			writer.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		if !token.Valid {
