@@ -29,7 +29,7 @@ func (controller *ShippingAddressControllerImpl) CreateOrder(writer http.Respons
 
 	detailOrders := []web.CreateOrder{}
 
-	for _, order := range orderCreateRequest.Detail {
+	for _, order := range orderCreateRequest.Products {
 		order.UserId = claim.Id
 		detailOrders = append(detailOrders, order)
 	}
@@ -37,7 +37,7 @@ func (controller *ShippingAddressControllerImpl) CreateOrder(writer http.Respons
 	orderCreate := web.OrderCreateRequest{
 		UserId:    claim.Id,
 		AddressId: orderCreateRequest.AddressId,
-		Detail:    detailOrders,
+		Products:  detailOrders,
 	}
 
 	orderResponse := controller.ShippingAddressService.CreateOrder(request.Context(), orderCreate)

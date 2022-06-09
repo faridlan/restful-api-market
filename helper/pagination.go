@@ -11,7 +11,7 @@ func Pagination(request *http.Request) domain.Pagination {
 	queryParam := request.URL.Query()
 	var pagintaion domain.Pagination
 	if len(queryParam) == 0 {
-		pagintaion.Page = 1
+		pagintaion.Page = 0
 		pagintaion.Limit = 10
 		return pagintaion
 	} else {

@@ -15,6 +15,7 @@ type ControllerRouter struct {
 	ShoppingCartController    controller.ShoppingCartController
 	StatusOrderController     controller.StatusOrderController
 	RoleController            controller.RoleController
+	SeederController          controller.SeederController
 }
 
 func NewRouter(controller ControllerRouter) *httprouter.Router {
@@ -57,10 +58,10 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	//ORDERS
 	router.POST("/api/orders", controller.ShippingAddressController.CreateOrder)
 	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
-	router.PUT("/api/status/order", controller.ShippingAddressController.UpdateStatus)
-	router.PUT("/api/payment/orders/:orderId", controller.ShippingAddressController.UpdatePayment)
 	router.GET("/api/customer/orders/:orderId", controller.ShippingAddressController.FindOrderById)
 	router.GET("/api/customer/orders", controller.ShippingAddressController.FindAllOrder)
+	router.PUT("/api/status/orders", controller.ShippingAddressController.UpdateStatus)
+	router.PUT("/api/payment/orders/:orderId", controller.ShippingAddressController.UpdatePayment)
 	router.GET("/api/orders/:orderId", controller.ShippingAddressController.FindById) // FOR ADMIN
 	router.GET("/api/orders", controller.ShippingAddressController.FindAll)           // FOR ADMIN
 
@@ -83,6 +84,10 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.PUT("/api/roles/:roleId", controller.RoleController.Update)
 	router.GET("/api/roles/:roleId", controller.RoleController.FindById)
 	router.GET("/api/roles", controller.RoleController.FindAll)
+
+	//Seeder
+	router.POST("/api/seeder", controller.SeederController.Create)
+	router.DELETE("/api/seeder", controller.SeederController.Delete)
 
 	router.PanicHandler = exception.ExceptionError
 

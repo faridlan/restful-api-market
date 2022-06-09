@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,22 +20,24 @@ import (
 type AuthServiceImpl struct {
 	UserRepository      repository.UserRepository
 	BlacklistRepository repository.BlacklistRepository
+	RoleRepository      repository.RoleRepository
 	Uuid                repository.UuidRepository
 	DB                  *sql.DB
 	Validate            *validator.Validate
 }
 
-func NewAuthService(userRepository repository.UserRepository, blacklistRepository repository.BlacklistRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) AuthService {
+func NewAuthService(userRepository repository.UserRepository, blacklistRepository repository.BlacklistRepository, RoleRepository repository.RoleRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) AuthService {
 	return AuthServiceImpl{
 		UserRepository:      userRepository,
 		BlacklistRepository: blacklistRepository,
+		RoleRepository:      RoleRepository,
 		Uuid:                Uuid,
 		DB:                  DB,
 		Validate:            validate,
 	}
 }
 
-func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCreateRequest) (web.UserResponse, web.Claims) {
+func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCreateRequest) (web.UserResponseLogin, web.Claims) {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -77,7 +80,7 @@ func (service AuthServiceImpl) Register(ctx context.Context, request web.UserCre
 	}
 
 	claimResult := helper.ToJwtResponse(claim)
-	userResult := helper.ToUserResponse(user)
+	userResult := helper.ToUserResponseLogin(user)
 
 	return userResult, claimResult
 }
@@ -95,6 +98,9 @@ func (service AuthServiceImpl) CreateUsers(ctx context.Context, request web.User
 	uuid, err := service.Uuid.CreteUui(ctx, tx)
 	helper.PanicIfError(err)
 
+	role, err := service.RoleRepository.FindById(ctx, tx, request.IdRole)
+	helper.PanicIfError(err)
+
 	user := domain.User{
 		IdUser:   uuid.Uuid,
 		Username: request.Username,
@@ -102,16 +108,20 @@ func (service AuthServiceImpl) CreateUsers(ctx context.Context, request web.User
 		Password: request.Password,
 		ImageUrl: stringImg,
 		Role: domain.Role{
-			Id: request.RoleId,
+			Id: role.Id,
 		},
 	}
 
-	user = service.UserRepository.Save(ctx, tx, user)
+	defer log.Print(user.Role.Id)
+
+	user = service.UserRepository.SaveUsers(ctx, tx, user)
+	user, err = service.UserRepository.FindById(ctx, tx, user.IdUser)
+	helper.PanicIfError(err)
 
 	return helper.ToUserResponse(user)
 }
 
-func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreateRequest) (web.UserResponse, web.Claims) {
+func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreateRequest) (web.UserResponseLogin, web.Claims) {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -129,8 +139,6 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 
 	user, err = service.UserRepository.Login(ctx, tx, user)
 	helper.PanicIfError(err)
-	user, err = service.UserRepository.FindById(ctx, tx, user.IdUser)
-	helper.PanicIfError(err)
 
 	claim := web.Claims{
 		Id:       user.Id,
@@ -145,7 +153,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 	}
 
 	claimResult := helper.ToJwtResponse(claim)
-	userResult := helper.ToUserResponse(user)
+	userResult := helper.ToUserResponseLogin(user)
 
 	return userResult, claimResult
 }
@@ -231,4 +239,15 @@ func (service AuthServiceImpl) UploadImage(ctx context.Context, request web.User
 	}
 
 	return image
+}
+
+func (service AuthServiceImpl) FindSeeder(ctx context.Context, pagination domain.Pagination) web.UserResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	users, err := service.UserRepository.FindSeeder(ctx, tx, pagination)
+	helper.PanicIfError(err)
+
+	return helper.ToUserResponse(users)
 }

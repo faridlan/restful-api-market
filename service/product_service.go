@@ -14,4 +14,5 @@ type ProductService interface {
 	FindyId(ctx context.Context, productId string) web.ProductResponse
 	FindAll(ctx context.Context, pagination domain.Pagination) []web.ProductResponse
 	CreateImg(ctx context.Context, request web.ProductCreateRequest) web.ProductResponse
+	FindSeeder(ctx context.Context, pagination domain.Pagination) []web.ProductResponse
 }

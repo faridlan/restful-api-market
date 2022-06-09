@@ -108,13 +108,24 @@ func (service AddressServiceImpl) FindById(ctx context.Context, addressId string
 	return helper.ToAddressResponse(address)
 }
 
-func (service AddressServiceImpl) FindAll(ctx context.Context, userId int) []web.AddressReponse {
+func (service AddressServiceImpl) FindAll(ctx context.Context, userId int, pagination domain.Pagination) []web.AddressReponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	addresses, err := service.AddressRepo.FindAll(ctx, tx, userId)
+	addresses, err := service.AddressRepo.FindAll(ctx, tx, userId, pagination)
 	helper.PanicIfError(err)
 
 	return helper.ToAddressResponses(addresses)
+}
+
+func (service AddressServiceImpl) FindSeeder(ctx context.Context, pagination domain.Pagination) web.AddressReponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	address, err := service.AddressRepo.FindSeeder(ctx, tx, pagination)
+	helper.PanicIfError(err)
+
+	return helper.ToAddressResponse(address)
 }

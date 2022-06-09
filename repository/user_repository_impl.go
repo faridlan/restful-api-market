@@ -44,8 +44,10 @@ func (repository UserRepositoryImpl) SaveUsers(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	SQL := "select id,id_user,username,email,role_id from users where (username =? or email =?) and password =?"
-	// SQL := "select id,username,email from users where (username =? or email =?) and password =?"
+	// SQL := "select id_user,username,email,role_id from users where (username =? or email =?) and password =?"
+	SQL := `select u.id, u.id_user,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
+	inner join roles as r on u.role_id = r.id
+	where (u.username =? or u.email =?) and u.password =?`
 	rows, err := tx.QueryContext(ctx, SQL, user.Username, user.Email, user.Password)
 	helper.PanicIfError(err)
 
@@ -53,7 +55,7 @@ func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user
 	user = domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.IdUser, &user.Username, &user.Email, &user.Role.Id)
+		err := rows.Scan(&user.Id, &user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
 		// err := rows.Scan(&user.Id, &user.Username, &user.Email)
 		helper.PanicIfError(err)
 		return user, nil
@@ -63,7 +65,7 @@ func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user
 }
 
 func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId string) (domain.User, error) {
-	SQL := `select u.id,u.id_user,u.username,u.email,u.image_url,r.id, r.role_name from users as u 
+	SQL := `select u.id_user,u.username,u.email,u.image_url, r.id, r.id_role, r.role_name from users as u 
 	inner join roles as r on u.role_id = r.id 
 	where u.id_user = ?`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
@@ -73,7 +75,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 	user := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.Name)
+		err := rows.Scan(&user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {
@@ -82,7 +84,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 }
 
 func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.User {
-	SQL := fmt.Sprintf(`select u.id,u.id_user,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
+	SQL := fmt.Sprintf(`select u.id_user,u.username,u.email,u.image_url,r.id, r.id_role, r.role_name from users as u 
 	inner join roles as r on u.role_id = r.id
 	order by u.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 	rows, err := tx.QueryContext(ctx, SQL)
@@ -93,7 +95,7 @@ func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pa
 
 	for rows.Next() {
 		user := domain.User{}
-		err := rows.Scan(&user.Id, &user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
+		err := rows.Scan(&user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
 		helper.PanicIfError(err)
 
 		users = append(users, user)
@@ -109,4 +111,26 @@ func (repository UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, use
 	helper.PanicIfError(err)
 
 	return user
+}
+
+func (repository UserRepositoryImpl) FindSeeder(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) (domain.User, error) {
+	SQL := fmt.Sprintf("select id, id_user from users order by id limit %d,%d", pagination.Page, pagination.Limit)
+	rows, err := tx.QueryContext(ctx, SQL)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+	user := domain.User{}
+	if rows.Next() {
+		err := rows.Scan(&user.Id, &user.IdUser)
+		helper.PanicIfError(err)
+		return user, nil
+	} else {
+		return user, errors.New("user not found")
+	}
+}
+
+func (repository UserRepositoryImpl) DeleteTable(ctx context.Context, tx *sql.Tx) {
+	SQL := "delete from users where id not in ( select id where role_id = 1 )"
+	_, err := tx.ExecContext(ctx, SQL)
+	helper.PanicIfError(err)
 }

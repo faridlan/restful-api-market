@@ -94,3 +94,37 @@ func (repository OrderDetailRepositoryImpl) FindById(ctx context.Context, tx *sq
 
 	return orders
 }
+
+func (repository OrderDetailRepositoryImpl) AdminFindById(ctx context.Context, tx *sql.Tx, orderId int) []domain.OrderDetail {
+	SQL := `select p.product_name, d.quantity, d.unit_price, d.total_price from orders as o
+	left join orders_detail as d on d.order_id = o.id
+	left join products as p on p.id = d.product_id 
+	where d.order_id = ?`
+
+	rows, err := tx.QueryContext(ctx, SQL, orderId)
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+
+	orders := []domain.OrderDetail{}
+
+	for rows.Next() {
+		order := domain.OrderDetail{}
+		err := rows.Scan(&order.Product.ProductName, &order.Quantity, &order.UnitPrice, &order.TotalPrice)
+		if err != nil {
+			panic(err)
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders
+}
+
+func (repository OrderDetailRepositoryImpl) DeleteTable(ctx context.Context, tx *sql.Tx) {
+	SQL := "delete from orders_detail"
+	_, err := tx.ExecContext(ctx, SQL)
+	helper.PanicIfError(err)
+}

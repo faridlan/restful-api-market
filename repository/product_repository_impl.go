@@ -48,7 +48,7 @@ func (repository ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId string) (domain.Product, error) {
-	SQL := `select p.id, p.id_product, p.product_name, c.id, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
+	SQL := `select p.id, p.id_product, p.product_name, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
 	from products as p
 	inner join categories as c on c.id = p.category_id
 	where p.id_product = ?`
@@ -58,7 +58,7 @@ func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx
 	defer rows.Close()
 	product := domain.Product{}
 	if rows.Next() {
-		err := rows.Scan(&product.Id, &product.IdProduct, &product.ProductName, &product.Category.Id, &product.Category.IdCategory, &product.Category.CategoryName, &product.Price, &product.Quantity, &product.ImageUrl)
+		err := rows.Scan(&product.Id, &product.IdProduct, &product.ProductName, &product.Category.IdCategory, &product.Category.CategoryName, &product.Price, &product.Quantity, &product.ImageUrl)
 		helper.PanicIfError(err)
 		return product, nil
 	} else {
@@ -68,9 +68,10 @@ func (repository ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx
 
 func (repository ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Product {
 
-	SQL := fmt.Sprintf(`select p.id, p.id_product, p.product_name, c.id, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
+	SQL := fmt.Sprintf(`select p.id_product, p.product_name, c.id_category, c.category_name, p.price, p.quantity, p.image_url 
 	from products as p
 	inner join categories as c on c.id = p.category_id
+	where p.quantity > 0
 	order by p.id desc limit %d,%d`, pagination.Page, pagination.Limit)
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
@@ -81,11 +82,33 @@ func (repository ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx,
 
 	for rows.Next() {
 		product := domain.Product{}
-		err := rows.Scan(&product.Id, &product.IdProduct, &product.ProductName, &product.Category.Id, &product.Category.IdCategory, &product.Category.CategoryName, &product.Price, &product.Quantity, &product.ImageUrl)
+		err := rows.Scan(&product.IdProduct, &product.ProductName, &product.Category.IdCategory, &product.Category.CategoryName, &product.Price, &product.Quantity, &product.ImageUrl)
 		helper.PanicIfError(err)
 
 		products = append(products, product)
 	}
 
 	return products
+}
+
+func (repository ProductRepositoryImpl) FindSeeder(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Product {
+	SQL := fmt.Sprintf("select id, id_product from products order by id limit %d,%d", pagination.Page, pagination.Limit)
+	rows, err := tx.QueryContext(ctx, SQL)
+	helper.PanicIfError(err)
+
+	defer rows.Close()
+	products := []domain.Product{}
+	for rows.Next() {
+		product := domain.Product{}
+		err := rows.Scan(&product.Id, &product.IdProduct)
+		helper.PanicIfError(err)
+		products = append(products, product)
+	}
+	return products
+}
+
+func (repository ProductRepositoryImpl) DeleteTable(ctx context.Context, tx *sql.Tx) {
+	SQL := "delete from products"
+	_, err := tx.ExecContext(ctx, SQL)
+	helper.PanicIfError(err)
 }

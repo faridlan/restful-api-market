@@ -1,0 +1,141 @@
+[{
+        "product_name": "Carrier 80L",
+        "id_category": "56e194e2e26711ec93820242ac110002",
+        "price": 525000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/qWzKqQFbuc.png"
+    },
+    {
+        "product_name": "Carrier 100L",
+        "id_category": "56e194e2e26711ec93820242ac110002",
+        "price": 825000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/sXalGqARmn.png"
+    },
+    {
+        "product_name": "Sling Bag XL",
+        "id_category": "56e194e2e26711ec93820242ac110002",
+        "price": 150000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/zzfNaVtAyy.png"
+    },
+    {
+        "product_name": "Sling Bag L",
+        "id_category": "56e194e2e26711ec93820242ac110002",
+        "price": 100000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/eBZBFelhXk.png"
+    },
+    {
+        "product_name": "Daypack",
+        "id_category": "56e194e2e26711ec93820242ac110002",
+        "price": 275000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/RCovgpVvlG.png"
+    },
+    {
+        "product_name": "Eiger Gloves Black",
+        "id_category": "cca5c881e44511ecabc0a2623c2c5e50",
+        "price": 175000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/xcdJJFuyZH.png"
+    },
+    {
+        "product_name": "Consina Gloves Black",
+        "id_category": "cca5c881e44511ecabc0a2623c2c5e50",
+        "price": 125000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/sFzXzrlczt.png"
+    },
+    {
+        "product_name": "Consina Gloves Blue",
+        "id_category": "cca5c881e44511ecabc0a2623c2c5e50",
+        "price": 125000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/povFOkqIex.png"
+    },
+    {
+        "product_name": "Consina Gloves Black Ed 2",
+        "id_category": "cca5c881e44511ecabc0a2623c2c5e50",
+        "price": 150000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/bAatLYHdao.png"
+    },
+    {
+        "product_name": "Torch Gloves Blue",
+        "id_category": "cca5c881e44511ecabc0a2623c2c5e50",
+        "price": 100000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/aczAInLqLI.png"
+    },
+    {
+        "product_name": "Foreister Shoe Navy Grey",
+        "id_category": "7058dda8e27611ec93820242ac110002",
+        "price": 335000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/wQpOQgNczg.png"
+    },
+    {
+        "product_name": "Eiger Shoe Light Brown",
+        "id_category": "7058dda8e27611ec93820242ac110002",
+        "price": 400000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/aiIsNBakqS.png"
+    },
+    {
+        "product_name": "Foreister Shoe Black",
+        "id_category": "7058dda8e27611ec93820242ac110002",
+        "price": 335000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/HCSjMJjxzu.png"
+    },
+    {
+        "product_name": "Eiger Shoe Brown",
+        "id_category": "7058dda8e27611ec93820242ac110002",
+        "price": 400000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/LUIDjUMmpB.png"
+    },
+    {
+        "product_name": "Consina Shoe Black",
+        "id_category": "7058dda8e27611ec93820242ac110002",
+        "price": 400000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/gBpnbPbgHM.png"
+    },
+    {
+        "product_name": "Watch Eiger Square",
+        "id_category": "e3f156dde27611ec93820242ac110002",
+        "price": 350000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/kkEYeqkKHq.png"
+    },
+    {
+        "product_name": "Watch Black",
+        "id_category": "e3f156dde27611ec93820242ac110002",
+        "price": 100000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/aSJlDSYEof.png"
+    },
+    {
+        "product_name": "Watch Suunto Black",
+        "id_category": "e3f156dde27611ec93820242ac110002",
+        "price": 125000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/VGqMZcLVCx.png"
+    },
+    {
+        "product_name": "Watch Eiger Pink",
+        "id_category": "e3f156dde27611ec93820242ac110002",
+        "price": 320000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/frDGXqwpzw.png"
+    },
+    {
+        "product_name": "Watch Eiger Grey Orange",
+        "id_category": "e3f156dde27611ec93820242ac110002",
+        "price": 370000,
+        "quantity": 100,
+        "image_url": "https://olshop.sgp1.digitaloceanspaces.com/products/hYeVwBTCML.png"
+    }
+]

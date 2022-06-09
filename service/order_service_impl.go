@@ -22,18 +22,20 @@ type ShippingAddressServiceImpl struct {
 	OrderDetailRepo repository.OrderDetailRepository
 	CartRepo        repository.CartRepository
 	AddressRepo     repository.AddressRepository
+	StatusRepo      repository.StatusOrderRepository
 	Uuid            repository.UuidRepository
 	DB              *sql.DB
 	Validate        *validator.Validate
 }
 
-func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, AddressRepo repository.AddressRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ShippingAddressService {
+func NewShippingAddressService(productRepo repository.ProductRepository, orderRepo repository.OrderRepository, orderDetailRepo repository.OrderDetailRepository, cartRepo repository.CartRepository, AddressRepo repository.AddressRepository, StatusRepo repository.StatusOrderRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ShippingAddressService {
 	return ShippingAddressServiceImpl{
 		ProductRepo:     productRepo,
 		OrderRepo:       orderRepo,
 		OrderDetailRepo: orderDetailRepo,
 		CartRepo:        cartRepo,
 		AddressRepo:     AddressRepo,
+		StatusRepo:      StatusRepo,
 		Uuid:            Uuid,
 		DB:              DB,
 		Validate:        validate,
@@ -67,22 +69,25 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	}
 
 	x := []domain.Product{}
-	for _, v := range request.Detail {
-		defer log.Print(v.ProductId)
+	for _, v := range request.Products {
+		// defer log.Print(v.ProductId)
 		product, err := service.ProductRepo.FindById(ctx, tx, v.ProductId)
 		if err != nil {
 			panic(exception.NewNotFoundError(err.Error()))
 		}
+		log.Print(product.Id)
+		log.Print(product)
 		x = append(x, product)
 	}
 
-	orders := helper.ToCreateOrders(request.Detail)
+	orders := helper.ToCreateOrders(request.Products)
 	ordersCreate := []domain.OrderDetail{}
 	for i, v := range x {
 		z := orders[i]
 		z.Product.Id = v.Id
 		ordersCreate = append(ordersCreate, z)
 	}
+
 	//Create Order
 
 	createOrder = service.OrderRepo.Save(ctx, tx, createOrder)
@@ -139,18 +144,22 @@ func (service ShippingAddressServiceImpl) UpdateStatus(ctx context.Context, requ
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
-	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
-	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-	order, err := service.OrderRepo.FindById(ctx, tx, request.IdOrder, request.UserId)
+	order, err := service.OrderRepo.FindId(ctx, tx, request.IdOrder)
+	helper.PanicIfError(err)
+	status, err := service.StatusRepo.FindById(ctx, tx, request.IdStatus)
 	helper.PanicIfError(err)
 
-	order.Status.Id = request.StatusId
-	order.Id = request.OrderId
+	order.Status.Id = status.Id
+	order.IdOrder = request.IdOrder
 	order.User.Id = request.UserId
 
 	order = service.OrderRepo.UpdateStatus(ctx, tx, order)
+	order, err = service.OrderRepo.FindId(ctx, tx, request.IdOrder)
+	helper.PanicIfError(err)
+	// orderDetail := service.OrderDetailRepo.FindById(ctx, tx, request.OrderId, request.UserId)
+	// ordersDetail := helper.ToOrderDetailResponses(orderDetail)
 
-	return helper.ToOrderResponse(order, ordersDetail)
+	return helper.ToOrdersResponse(order)
 }
 
 func (service ShippingAddressServiceImpl) UpdatePayment(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse {
@@ -220,6 +229,8 @@ func (service ShippingAddressServiceImpl) FindById(ctx context.Context, orderId 
 
 	order, err := service.OrderRepo.FindId(ctx, tx, orderId)
 	helper.PanicIfError(err)
+	orders := service.OrderDetailRepo.AdminFindById(ctx, tx, order.Id)
+	ordersDetail := helper.ToOrderDetailResponses(orders)
 
-	return helper.ToOrdersResponse(order)
+	return helper.ToOrderResponse(order, ordersDetail)
 }

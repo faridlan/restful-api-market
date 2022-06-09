@@ -98,8 +98,9 @@ func (controller *AddressControllerImpl) FindById(writer http.ResponseWriter, re
 func (controller *AddressControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	claim := web.Claims{}
 	helper.ParseJwt(request, &claim)
+	pagination := helper.Pagination(request)
 
-	addressResponses := controller.AddressService.FindAll(request.Context(), claim.Id)
+	addressResponses := controller.AddressService.FindAll(request.Context(), claim.Id, pagination)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

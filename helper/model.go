@@ -5,6 +5,21 @@ import (
 	"github.com/faridlan/restful-api-market/model/web"
 )
 
+func ToUserResponseLogin(user domain.User) web.UserResponseLogin {
+	return web.UserResponseLogin{
+		User: &web.UserResponse{
+			IdUser:   user.IdUser,
+			Username: user.Username,
+			Email:    user.Email,
+			ImageUrl: user.ImageUrl,
+			Role: &web.RoleResponse{
+				IdRole: user.Role.IdRole,
+				Name:   user.Role.Name,
+			},
+		},
+	}
+}
+
 func ToUserResponse(user domain.User) web.UserResponse {
 	return web.UserResponse{
 		Id:       user.Id,
@@ -13,7 +28,6 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		Email:    user.Email,
 		ImageUrl: user.ImageUrl,
 		Role: &web.RoleResponse{
-			Id:     user.Role.Id,
 			IdRole: user.Role.IdRole,
 			Name:   user.Role.Name,
 		},
@@ -108,10 +122,10 @@ func ToAddressResponse(address domain.Address) web.AddressReponse {
 	return web.AddressReponse{
 		Id:        address.Id,
 		IdAddress: address.IdAddress,
-		User: &web.UserResponse{
-			Id:       address.User.Id,
-			Username: address.User.Username,
-		},
+		// User: web.User{
+		// 	Id:       address.User.Id,
+		// 	Username: address.User.Username,
+		// },
 		Name:            address.Name,
 		HandphoneNumber: address.HandphoneNumber,
 		Street:          address.Street,
@@ -150,14 +164,10 @@ func ToOrderDetailResponses(orders []domain.OrderDetail) []web.OrdersDetail {
 
 func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderResponse {
 	return web.OrderResponse{
-		OrderId: order.Id,
+		// OrderId: order.Id,
 		IdOrder: order.IdOrder,
-		User: &web.UserResponse{
-			Id:       order.User.Id,
-			Username: order.User.Username,
-		},
 		Address: &web.AddressReponse{
-			Id:              order.Address.Id,
+			IdAddress:       order.Address.IdAddress,
 			Name:            order.Address.Name,
 			HandphoneNumber: order.Address.HandphoneNumber,
 			Street:          order.Address.Street,
@@ -165,11 +175,11 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 			PostCode:        order.Address.PostCode,
 			Comment:         order.Address.Comment,
 		},
-		Detail:    orders,
+		Products:  orders,
 		Total:     order.Total,
 		OrderDate: order.OrderDate,
 		Status: web.StatusOrderResponse{
-			Id:         order.Status.Id,
+			IdStatus:   order.Status.IdStatusOrder,
 			StatusName: order.Status.StatusName,
 		},
 		Payment: order.Payment,
@@ -178,16 +188,12 @@ func ToOrderResponse(order domain.Order, orders []web.OrdersDetail) web.OrderRes
 
 func ToOrdersResponse(order domain.Order) web.OrderResponse {
 	return web.OrderResponse{
-		OrderId: order.Id,
-		IdOrder: order.IdOrder,
-		User: &web.UserResponse{
-			Id:       order.User.Id,
-			Username: order.User.Username,
-		},
+		// OrderId:   order.Id,
+		IdOrder:   order.IdOrder,
 		Total:     order.Total,
 		OrderDate: order.OrderDate,
 		Status: web.StatusOrderResponse{
-			Id:         order.Status.Id,
+			IdStatus:   order.Status.IdStatusOrder,
 			StatusName: order.Status.StatusName,
 		},
 		Payment: order.Payment,
@@ -279,7 +285,6 @@ func ToStatusOrderResponses(statusOrders []domain.StatusOrder) []web.StatusOrder
 
 func ToRoleResponse(role domain.Role) web.RoleResponse {
 	return web.RoleResponse{
-		Id:     role.Id,
 		IdRole: role.IdRole,
 		Name:   role.Name,
 	}
@@ -346,27 +351,3 @@ func ToCreateOrders(orders []web.CreateOrder) []domain.OrderDetail {
 
 	return createOrders
 }
-
-// func ToRegisterResponse()  {
-// 	return web.Claims{
-// 		Id:               user.Id,
-// 		IdUser:           user.IdUser,
-// 		Username:         user.Username,
-// 		Email:            user.Email,
-// 		RoleId:           user.RoleId,
-// 		Token:            user.Token,
-// 		RegisteredClaims: user.RegisteredClaims,
-// 	}
-// 	return web.UserResponse{
-// 		Id:       user.Id,
-// 		IdUser:   user.IdUser,
-// 		Username: user.Username,
-// 		Email:    user.Email,
-// 		ImageUrl: user.ImageUrl,
-// 		Role: &web.RoleResponse{
-// 			Id:     user.Role.Id,
-// 			IdRole: user.Role.IdRole,
-// 			Name:   user.Role.Name,
-// 		},
-// 	}
-// }

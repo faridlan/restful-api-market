@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -16,18 +17,20 @@ import (
 )
 
 type ProductServiceImpl struct {
-	ProductRepository repository.ProductRepository
-	Uuid              repository.UuidRepository
-	DB                *sql.DB
-	Validate          *validator.Validate
+	ProductRepository  repository.ProductRepository
+	CategoryRepository repository.CategoryRepository
+	Uuid               repository.UuidRepository
+	DB                 *sql.DB
+	Validate           *validator.Validate
 }
 
-func NewProductServie(productRepository repository.ProductRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ProductService {
+func NewProductServie(productRepository repository.ProductRepository, CategoryRepository repository.CategoryRepository, Uuid repository.UuidRepository, DB *sql.DB, validate *validator.Validate) ProductService {
 	return ProductServiceImpl{
-		ProductRepository: productRepository,
-		Uuid:              Uuid,
-		DB:                DB,
-		Validate:          validate,
+		ProductRepository:  productRepository,
+		Uuid:               Uuid,
+		CategoryRepository: CategoryRepository,
+		DB:                 DB,
+		Validate:           validate,
 	}
 }
 
@@ -38,12 +41,15 @@ func (service ProductServiceImpl) Create(ctx context.Context, request web.Produc
 
 	uuid, err := service.Uuid.CreteUui(ctx, tx)
 	helper.PanicIfError(err)
+	defer log.Print(request.IdCategory)
+	category, err := service.CategoryRepository.FindById(ctx, tx, request.IdCategory)
+	helper.PanicIfError(err)
 
 	product := domain.Product{
 		IdProduct:   uuid.Uuid,
 		ProductName: request.ProductName,
 		Category: domain.Category{
-			Id: request.CategoryId,
+			Id: category.Id,
 		},
 		Price:    request.Price,
 		Quantity: request.Quantity,
@@ -51,6 +57,8 @@ func (service ProductServiceImpl) Create(ctx context.Context, request web.Produc
 	}
 
 	product = service.ProductRepository.Save(ctx, tx, product)
+	product, err = service.ProductRepository.FindById(ctx, tx, product.IdProduct)
+	helper.PanicIfError(err)
 
 	return helper.ToProductResponse(product)
 }
@@ -134,4 +142,15 @@ func (servicer ProductServiceImpl) CreateImg(ctx context.Context, request web.Pr
 
 	return image
 
+}
+
+func (service ProductServiceImpl) FindSeeder(ctx context.Context, pagination domain.Pagination) []web.ProductResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollbak(tx)
+
+	products := service.ProductRepository.FindSeeder(ctx, tx, pagination)
+	helper.PanicIfError(err)
+
+	return helper.ToProductResponses(products)
 }

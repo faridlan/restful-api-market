@@ -19,21 +19,31 @@ func main() {
 
 	uuidRepository := repository.NewUuidRepository()
 
-	//Admin
-	//Product Feature
-	productRepository := repository.NewProdcutRepository()
-	productService := service.NewProductServie(productRepository, uuidRepository, db, validate)
-	productController := controller.NewProductController(productService)
+	//Status Order
+	statusOrderRepository := repository.NewStatusOrderRepository()
+	statusOrderService := service.NewStatusOrderService(statusOrderRepository, uuidRepository, db, validate)
+	statusOrderContoller := controller.NewStatusOrderController(statusOrderService)
+
+	//Roles
+	roleRepository := repository.NewRoleRepository()
+	roleService := service.NewRoleService(roleRepository, uuidRepository, db, validate)
+	roleController := controller.NewRoleController(roleService)
 
 	//Category
 	categoryRepository := repository.NewCategoryRepository()
 	categoryService := service.NewCategoryService(categoryRepository, uuidRepository, db, validate)
 	CategoryController := controller.NewCategoryController(categoryService)
 
+	//Admin
+	//Product Feature
+	productRepository := repository.NewProdcutRepository()
+	productService := service.NewProductServie(productRepository, categoryRepository, uuidRepository, db, validate)
+	productController := controller.NewProductController(productService)
+
 	//auth
 	userRepository := repository.NewUserRepository()
 	blacklistRepository := repository.NewBlacklistRepository()
-	userService := service.NewAuthService(userRepository, blacklistRepository, uuidRepository, db, validate)
+	userService := service.NewAuthService(userRepository, blacklistRepository, roleRepository, uuidRepository, db, validate)
 	authController := controller.NewAuthController(userService)
 
 	//product detail
@@ -51,18 +61,12 @@ func main() {
 	//shipping address
 	orderRepository := repository.NewOrderRepository()
 	orderDetailRepository := repository.NewOrderDetailRepository()
-	shippingAddressService := service.NewShippingAddressService(productRepository, orderRepository, orderDetailRepository, cartRepository, addressRepository, uuidRepository, db, validate)
+	shippingAddressService := service.NewShippingAddressService(productRepository, orderRepository, orderDetailRepository, cartRepository, addressRepository, statusOrderRepository, uuidRepository, db, validate)
 	shippingAddressController := controller.NewShippingAddressController(shippingAddressService)
 
-	//Status Order
-	statusOrderRepository := repository.NewStatusOrderRepository()
-	statusOrderService := service.NewStatusOrderService(statusOrderRepository, uuidRepository, db, validate)
-	statusOrderContoller := controller.NewStatusOrderController(statusOrderService)
-
-	//Roles
-	roleRepository := repository.NewRoleRepository()
-	roleService := service.NewRoleService(roleRepository, uuidRepository, db, validate)
-	roleController := controller.NewRoleController(roleService)
+	//seeder
+	seederService := service.NewSeedService(addressRepository, orderDetailRepository, orderRepository, productRepository, userRepository, db)
+	seederController := controller.NewSeederController(seederService, userService, addressSerice, productService, shippingAddressService)
 
 	controller := app.ControllerRouter{
 		AddressController:         addressController,
@@ -73,6 +77,7 @@ func main() {
 		ShoppingCartController:    shoppingCartController,
 		StatusOrderController:     statusOrderContoller,
 		RoleController:            roleController,
+		SeederController:          seederController,
 	}
 
 	blacklist := repository.NewBlacklistRepository()

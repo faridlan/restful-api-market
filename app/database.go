@@ -14,9 +14,9 @@ func NewDB() *sql.DB {
 	pass := os.Getenv("PASSWORD")
 	port := os.Getenv("PORT")
 	host := os.Getenv("HOST")
+	dbname := os.Getenv("DB")
 
-	// db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/e_market?parseTime=true")
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/e_market?parseTime=true", user, pass, host, port))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, pass, host, port, dbname))
 	helper.PanicIfError(err)
 
 	db.SetConnMaxIdleTime(10 * time.Minute)

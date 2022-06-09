@@ -6,5 +6,6 @@ type OrderUpdateRequest struct {
 	OrderId  int    `json:"order_id,omitempty"`
 	Payment  string `json:"payment,omitempty"`
 	StatusId int    `json:"status_id,omitempty"`
+	IdStatus string `json:"id_status,omitempty"`
 	ImageUrl string `json:"image_url,omitempty"`
 }

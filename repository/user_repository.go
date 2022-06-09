@@ -14,4 +14,6 @@ type UserRepository interface {
 	FindById(ctx context.Context, tx *sql.Tx, userId string) (domain.User, error)
 	FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.User
 	Update(ctx context.Context, tx *sql.Tx, user domain.User) domain.User
+	FindSeeder(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) (domain.User, error)
+	DeleteTable(ctx context.Context, tx *sql.Tx)
 }

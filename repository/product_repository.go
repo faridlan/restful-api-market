@@ -13,4 +13,6 @@ type ProductRepository interface {
 	Delete(ctx context.Context, tx *sql.Tx, product domain.Product)
 	FindById(ctx context.Context, tx *sql.Tx, productId string) (domain.Product, error)
 	FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Product
+	FindSeeder(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Product
+	DeleteTable(ctx context.Context, tx *sql.Tx)
 }

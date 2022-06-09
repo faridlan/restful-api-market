@@ -16,4 +16,5 @@ type OrderRepository interface {
 	UpdatePayment(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
 	FindAll(ctx context.Context, tx *sql.Tx, pagination domain.Pagination) []domain.Order
 	FindId(ctx context.Context, tx *sql.Tx, orderId string) (domain.Order, error)
+	DeleteTable(ctx context.Context, tx *sql.Tx)
 }

@@ -7,11 +7,15 @@ type UserResponse struct {
 	IdUser   string            `json:"id_user,omitempty"`
 	Username string            `json:"username,omitempty"`
 	Email    string            `json:"email,omitempty"`
-	ImageUrl *model.NullString `json:"image_url,omitempty"`
+	ImageUrl *model.NullString `json:"image_url"`
 	Role     *RoleResponse     `json:"role,omitempty"`
-	Token    string            `json:"token,omitempty"`
+}
+
+type UserResponseLogin struct {
+	User  *UserResponse `json:"user,omitempty"`
+	Token string        `json:"token,omitempty"`
 }
 
 type UserResponseImg struct {
-	ImageUrl string `json:"image_url,omitempty"`
+	ImageUrl string `json:"image_url"`
 }

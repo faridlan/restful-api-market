@@ -47,7 +47,7 @@ func (controller *AuthControllerImpl) CreateUsers(writer http.ResponseWriter, re
 	userCreateRequest := web.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
-	userResponse, _ := controller.AuthService.Register(request.Context(), userCreateRequest)
+	userResponse := controller.AuthService.CreateUsers(request.Context(), userCreateRequest)
 
 	webResponse := web.WebResponse{
 		Code:   200,

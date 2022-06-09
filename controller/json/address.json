@@ -1,0 +1,41 @@
+[{
+        "name": "userA",
+        "handphone_number": "089543526123",
+        "street": "Jl.UserA",
+        "district": "UserADistrick",
+        "postal_code": 46151,
+        "comment": "Dekat ATM AAA"
+    },
+    {
+        "name": "userB",
+        "handphone_number": "089543526123",
+        "street": "Jl.UserB",
+        "district": "UserBDistrick",
+        "postal_code": 46152,
+        "comment": "Dekat ATM BBB"
+    },
+    {
+        "name": "userC",
+        "handphone_number": "089543527123",
+        "street": "Jl.UserC",
+        "district": "UserCDistrick",
+        "postal_code": 46153,
+        "comment": "Dekat ATM CCC"
+    },
+    {
+        "name": "userD",
+        "handphone_number": "089843526123",
+        "street": "Jl.UserD",
+        "district": "UserDDistrick",
+        "postal_code": 46154,
+        "comment": "Dekat ATM DDD"
+    },
+    {
+        "name": "userE",
+        "handphone_number": "085543526123",
+        "street": "Jl.UserE",
+        "district": "UserEDistrick",
+        "postal_code": 46155,
+        "comment": "Dekat ATM EEE"
+    }
+]
