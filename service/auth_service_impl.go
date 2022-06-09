@@ -138,7 +138,9 @@ func (service AuthServiceImpl) Login(ctx context.Context, request web.LoginCreat
 	}
 
 	user, err = service.UserRepository.Login(ctx, tx, user)
-	helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewUnauthError(err.Error()))
+	}
 
 	claim := web.Claims{
 		Id:       user.Id,
