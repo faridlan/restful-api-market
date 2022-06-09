@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -70,13 +69,10 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 
 	x := []domain.Product{}
 	for _, v := range request.Products {
-		// defer log.Print(v.ProductId)
 		product, err := service.ProductRepo.FindById(ctx, tx, v.ProductId)
 		if err != nil {
 			panic(exception.NewNotFoundError(err.Error()))
 		}
-		log.Print(product.Id)
-		log.Print(product)
 		x = append(x, product)
 	}
 
@@ -104,7 +100,6 @@ func (service ShippingAddressServiceImpl) CreateOrder(ctx context.Context, reque
 	//Make Response Order
 	orderDetail := service.OrderDetailRepo.FindById(ctx, tx, createOrder.Id, createOrder.User.Id)
 	ordersDetail := helper.ToOrderDetailResponses(orderDetail)
-	defer log.Print(createOrder.IdOrder)
 	orderResponse, err := service.OrderRepo.FindById(ctx, tx, createOrder.IdOrder, createOrder.User.Id)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))

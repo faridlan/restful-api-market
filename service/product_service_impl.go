@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -35,13 +34,15 @@ func NewProductServie(productRepository repository.ProductRepository, CategoryRe
 }
 
 func (service ProductServiceImpl) Create(ctx context.Context, request web.ProductCreateRequest) web.ProductResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollbak(tx)
 
 	uuid, err := service.Uuid.CreteUui(ctx, tx)
 	helper.PanicIfError(err)
-	defer log.Print(request.IdCategory)
 	category, err := service.CategoryRepository.FindById(ctx, tx, request.IdCategory)
 	helper.PanicIfError(err)
 

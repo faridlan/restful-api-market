@@ -21,7 +21,7 @@ import (
 )
 
 func setupDBTest() *sql.DB {
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/olshop_test")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/olshop_test?parseTime=true")
 	helper.PanicIfError(err)
 
 	db.SetMaxIdleConns(5)
@@ -105,13 +105,8 @@ func setupRouter(db *sql.DB) http.Handler {
 
 }
 
-func truncateUser(db *sql.DB) {
-	db.Exec("TRUNCATE users")
-}
-
 func TestCreateUserSuccess(t *testing.T) {
 	db := setupDBTest()
-	truncateUser(db)
 	router := setupRouter(db)
 
 	requestBody := strings.NewReader(`
@@ -139,7 +134,6 @@ func TestCreateUserSuccess(t *testing.T) {
 
 func TestCreateUserFailed(t *testing.T) {
 	db := setupDBTest()
-	truncateUser(db)
 	router := setupRouter(db)
 
 	requestBody := strings.NewReader(`
@@ -166,7 +160,6 @@ func TestCreateUserFailed(t *testing.T) {
 
 func TestLoginSuccess(t *testing.T) {
 	db := setupDBTest()
-	truncateUser(db)
 	router := setupRouter(db)
 
 	requestBody := strings.NewReader(`
@@ -193,7 +186,6 @@ func TestLoginSuccess(t *testing.T) {
 
 func TestLoginFailed(t *testing.T) {
 	db := setupDBTest()
-	truncateUser(db)
 	router := setupRouter(db)
 
 	requestBody := strings.NewReader(`

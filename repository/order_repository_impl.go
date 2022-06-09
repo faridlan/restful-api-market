@@ -106,7 +106,7 @@ func (repository OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, p
 	SQL := fmt.Sprintf(`select o.id_order,
 	o.total, o.order_date, s.id_status_order, s.status_name, o.payment from orders as o
 	inner join status_order as s on s.id = o.status_id
-	order by o.id desc limit %d,%d`, pagination.Page, pagination.Limit)
+	order by o.payment desc limit %d,%d`, pagination.Page, pagination.Limit)
 
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)

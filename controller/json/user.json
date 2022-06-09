@@ -1,26 +1,27 @@
-[{
-        "username": "userA",
-        "email": "userA@usera.com",
-        "password": "userA123"
+[
+    {
+        "username": "usera",
+        "email": "usera@mail.com",
+        "password": "secret123"
     },
     {
-        "username": "userB",
-        "email": "useB@usera.com",
-        "password": "userA123"
+        "username": "userb",
+        "email": "userb@mail.com",
+        "password": "secret123"
     },
     {
-        "username": "userC",
-        "email": "useC@usera.com",
-        "password": "userA123"
+        "username": "userc",
+        "email": "userc@mail.com",
+        "password": "secret123"
     },
     {
-        "username": "userD",
-        "email": "useD@usera.com",
-        "password": "userA123"
+        "username": "userd",
+        "email": "userd@mail.com",
+        "password": "secret123"
     },
     {
-        "username": "userE",
-        "email": "useE@usera.com",
-        "password": "userA123"
+        "username": "usere",
+        "email": "usere@mail.com",
+        "password": "secret123"
     }
 ]

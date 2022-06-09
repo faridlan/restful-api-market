@@ -60,7 +60,7 @@ func NewRouter(controller ControllerRouter) *httprouter.Router {
 	router.POST("/api/payment/image", controller.ShippingAddressController.CreateImg)
 	router.GET("/api/customer/orders/:orderId", controller.ShippingAddressController.FindOrderById)
 	router.GET("/api/customer/orders", controller.ShippingAddressController.FindAllOrder)
-	router.PUT("/api/status/orders", controller.ShippingAddressController.UpdateStatus)
+	router.PUT("/api/status/orders/:orderId", controller.ShippingAddressController.UpdateStatus)
 	router.PUT("/api/payment/orders/:orderId", controller.ShippingAddressController.UpdatePayment)
 	router.GET("/api/orders/:orderId", controller.ShippingAddressController.FindById) // FOR ADMIN
 	router.GET("/api/orders", controller.ShippingAddressController.FindAll)           // FOR ADMIN

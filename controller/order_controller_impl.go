@@ -86,6 +86,10 @@ func (controller *ShippingAddressControllerImpl) UpdateStatus(writer http.Respon
 	orderUpdateRequest := web.OrderUpdateRequest{}
 	helper.ReadFromRequestBody(request, &orderUpdateRequest)
 
+	orderId := params.ByName("orderId")
+
+	orderUpdateRequest.IdOrder = orderId
+
 	orderResponse := controller.ShippingAddressService.UpdateStatus(request.Context(), orderUpdateRequest)
 	webResponse := web.WebResponse{
 		Code:   200,

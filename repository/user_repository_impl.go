@@ -65,7 +65,7 @@ func (repository UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user
 }
 
 func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId string) (domain.User, error) {
-	SQL := `select u.id_user,u.username,u.email,u.image_url, r.id, r.id_role, r.role_name from users as u 
+	SQL := `select u.id,u.id_user,u.username,u.email,u.image_url, r.id, r.id_role, r.role_name from users as u 
 	inner join roles as r on u.role_id = r.id 
 	where u.id_user = ?`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
@@ -75,7 +75,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 	user := domain.User{}
 
 	if rows.Next() {
-		err := rows.Scan(&user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
+		err := rows.Scan(&user.Id, &user.IdUser, &user.Username, &user.Email, &user.ImageUrl, &user.Role.Id, &user.Role.IdRole, &user.Role.Name)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {
