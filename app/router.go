@@ -16,11 +16,14 @@ type ControllerRouter struct {
 	StatusOrderController     controller.StatusOrderController
 	RoleController            controller.RoleController
 	SeederController          controller.SeederController
+	HomeController            controller.HomeController
 }
 
 func NewRouter(controller ControllerRouter) *httprouter.Router {
 
 	router := httprouter.New()
+
+	router.GET("/", controller.HomeController.Home)
 
 	//ADDRESS
 	router.POST("/api/addresses", controller.AddressController.Create)

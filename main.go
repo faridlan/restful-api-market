@@ -68,6 +68,10 @@ func main() {
 	seederService := service.NewSeedService(addressRepository, orderDetailRepository, orderRepository, productRepository, userRepository, db)
 	seederController := controller.NewSeederController(seederService, userService, addressSerice, productService, shippingAddressService)
 
+	//home
+
+	homeController := controller.NewHomeController()
+
 	controller := app.ControllerRouter{
 		AddressController:         addressController,
 		AuthController:            authController,
@@ -78,6 +82,7 @@ func main() {
 		StatusOrderController:     statusOrderContoller,
 		RoleController:            roleController,
 		SeederController:          seederController,
+		HomeController:            homeController,
 	}
 
 	blacklist := repository.NewBlacklistRepository()
