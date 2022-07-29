@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/faridlan/restful-api-market/helper"
+	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/service"
 	"github.com/julienschmidt/httprouter"
@@ -96,18 +96,23 @@ func (controller *ProductControllerImpl) CreateImg(writer http.ResponseWriter, r
 	err := request.ParseMultipartForm(10 << 20)
 	helper.PanicIfError(err)
 
-	file, _, err := request.FormFile("productImage")
+	file, fileHeader, err := request.FormFile("productImage")
 	helper.PanicIfError(err)
 	defer file.Close()
 
-	fileBytes, err := ioutil.ReadAll(file)
-	helper.PanicIfError(err)
+	// fileBytes, err := ioutil.ReadAll(file)
+	// helper.PanicIfError(err)
 
-	image := web.ProductCreateRequest{
-		ImageUrl: string(fileBytes),
+	// image := web.ProductCreateRequest{
+	// 	ImageUrl: string(fileBytes),
+	// }
+
+	storage := domain.Storage{
+		Name: fileHeader.Filename,
+		File: file,
 	}
 
-	productResponse := controller.ProductService.CreateImg(request.Context(), image)
+	productResponse := controller.ProductService.CreateImg(request.Context(), storage)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

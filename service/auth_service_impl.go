@@ -4,10 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/faridlan/restful-api-market/exception"
 	"github.com/faridlan/restful-api-market/helper"
 	"github.com/faridlan/restful-api-market/model/domain"
@@ -222,22 +219,25 @@ func (service AuthServiceImpl) FindAll(ctx context.Context, pagination domain.Pa
 	return helper.ToUserResponses(users)
 }
 
-func (service AuthServiceImpl) UploadImage(ctx context.Context, request web.UserCreateRequest) web.UserResponseImg {
-	random := helper.RandStringRunes(10)
-	s3Client, endpoint := helper.S3Config()
+func (service AuthServiceImpl) UploadImage(ctx context.Context, storage domain.Storage) web.UserResponseImg {
+	// random := helper.RandStringRunes(10)
+	// s3Client, endpoint := helper.S3Config()
 
-	object := s3.PutObjectInput{
-		Bucket: aws.String("olshop"),
-		Key:    aws.String("/profiles/" + random + ".png"),
-		Body:   strings.NewReader(string(request.ImageUrl)),
-		ACL:    aws.String("public-read"),
-	}
+	// object := s3.PutObjectInput{
+	// 	Bucket: aws.String("olshop"),
+	// 	Key:    aws.String("/profiles/" + random + ".png"),
+	// 	Body:   strings.NewReader(string(request.ImageUrl)),
+	// 	ACL:    aws.String("public-read"),
+	// }
 
-	_, err := s3Client.PutObject(&object)
+	// _, err := s3Client.PutObject(&object)
+	// helper.PanicIfError(err)
+
+	err := helper.Uploader.UploadFile(storage.File, storage.Name)
 	helper.PanicIfError(err)
 
 	image := web.UserResponseImg{
-		ImageUrl: "https://" + *object.Bucket + "." + endpoint + *object.Key,
+		ImageUrl: "https://storage.googleapis.com/nostra-storage/images/" + storage.Name,
 	}
 
 	return image

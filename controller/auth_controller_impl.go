@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"io/ioutil"
 	"net/http"
 	"strings"
 
 	"github.com/faridlan/restful-api-market/helper"
+	"github.com/faridlan/restful-api-market/model/domain"
 	"github.com/faridlan/restful-api-market/model/web"
 	"github.com/faridlan/restful-api-market/service"
 	"github.com/golang-jwt/jwt/v4"
@@ -160,18 +160,23 @@ func (controller *AuthControllerImpl) CreateImg(writer http.ResponseWriter, requ
 	err := request.ParseMultipartForm(10 << 20)
 	helper.PanicIfError(err)
 
-	file, _, err := request.FormFile("profileImage")
+	file, fileHeader, err := request.FormFile("profileImage")
 	helper.PanicIfError(err)
 	defer file.Close()
 
-	fileBytes, err := ioutil.ReadAll(file)
-	helper.PanicIfError(err)
+	// fileBytes, err := ioutil.ReadAll(file)
+	// helper.PanicIfError(err)
 
-	image := web.UserCreateRequest{
-		ImageUrl: string(fileBytes),
+	// image := web.UserCreateRequest{
+	// 	ImageUrl: string(fileBytes),
+	// }
+
+	storage := domain.Storage{
+		Name: fileHeader.Filename,
+		File: file,
 	}
 
-	userResponse := controller.AuthService.UploadImage(request.Context(), image)
+	userResponse := controller.AuthService.UploadImage(request.Context(), storage)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

@@ -15,6 +15,6 @@ type AuthService interface {
 	UpdateProfile(ctx context.Context, request web.UserUpdateRequest) web.UserResponse
 	FindAll(ctx context.Context, pagination domain.Pagination) []web.UserResponse
 	Logout(ctx context.Context, request web.BlacklistCreateRequest) web.BlacklistResponse
-	UploadImage(ctx context.Context, request web.UserCreateRequest) web.UserResponseImg
+	UploadImage(ctx context.Context, storage domain.Storage) web.UserResponseImg
 	FindSeeder(ctx context.Context, pagination domain.Pagination) web.UserResponse
 }
